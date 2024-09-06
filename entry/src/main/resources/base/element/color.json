@@ -9,11 +9,11 @@
       "value": "#f7f7f7"
     },
     {
-      "name": "bg_gray_second",
+      "name": "light_bg_gray",
       "value": "#f9f9f9"
     },
     {
-      "name": "gray_second",
+      "name": "gray",
       "value": "#666666"
     },
     {
@@ -33,7 +33,7 @@
       "value": "#fff"
     },
     {
-      "name": "gray",
+      "name": "light_gray",
       "value": "#999999"
     }
   ]

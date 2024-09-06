@@ -13,27 +13,34 @@ struct Index {
     Tabs({barPosition: BarPosition.End}) {
       TabContent() {
         Home()
-      }.tabBar(this.tabBarBuilder('app.media.tabbar_home', '首页', 0))
+      }.tabBar(this.tabItemBuilder('app.media.tabbar_home', '首页', 0))
+      .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP])
 
       TabContent() {
         ToSee()
-      }.tabBar(this.tabBarBuilder('app.media.tabbar_see', '想看', 1))
+      }.tabBar(this.tabItemBuilder('app.media.tabbar_see', '想看', 1))
+      .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP])
 
       TabContent() {
         Service()
-      }.tabBar(this.tabBarBuilder('app.media.tabbar_service', '服务', 2))
+      }.tabBar(this.tabItemBuilder('app.media.tabbar_service', '服务', 2))
+      .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP])
 
       TabContent() {
         Discover()
-      }.tabBar(this.tabBarBuilder('app.media.tabbar_discover', '发现', 3))
+      }.tabBar(this.tabItemBuilder('app.media.tabbar_discover', '发现', 3))
+      .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP])
 
       TabContent() {
         Profile()
-      }.tabBar(this.tabBarBuilder('app.media.tabbar_my', '我的', 4))
+      }.tabBar(this.tabItemBuilder('app.media.tabbar_my', '我的', 4))
+      .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP])
     }
-    .height('100%')
     .width('100%')
+    .height('100%')
     .scrollable(false)
+    .animationDuration(0)
+    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP])
     .onChange((idx: number) => {
       this.curIdx = idx
     })
@@ -41,7 +48,7 @@ struct Index {
 
   //自定义 tabBar
   @Builder
-  tabBarBuilder(icon: string, text: string, idx: number) {
+  tabItemBuilder(icon: string, text: string, idx: number) {
     Column() {
       //图标
       Image(this.curIdx == idx ? $r(`${icon}_active`) : $r(icon))
@@ -51,7 +58,7 @@ struct Index {
       //名称
       Text(text)
         .fontSize(10)
-        .fontColor(this.curIdx == idx ? $r('app.color.black') : $r('app.color.gray'))
+        .fontColor(this.curIdx == idx ? $r('app.color.primary') : $r('app.color.gray'))
     }
   }
 }
