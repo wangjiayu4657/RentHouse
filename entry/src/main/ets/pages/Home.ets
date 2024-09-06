@@ -1,13 +1,14 @@
 import Api from '../service/http/Api'
-import { BannerList, HomeModel } from '../models/home/homeModel'
+import { BannerList, HomeModel } from '../models/home/HomeModel'
 import httpUtil from '../service/http/http'
 import { Banner } from '../views/home/Banner';
 import UPSearch from '../views/home/UPSearch';
+import { BannerDataSource } from '../models/home/BannerDataSource';
 
 
 @Component
 export struct Home {
-  @State bannerList: BannerList = [];
+  @State bannerSource: BannerDataSource = new BannerDataSource()
 
   aboutToAppear(): void {
     this.requestHomeData()
@@ -16,7 +17,7 @@ export struct Home {
   build() {
     Scroll() {
       Stack() {
-        Banner({bannerList: this.bannerList})
+        Banner({bannerSource: this.bannerSource})
         UPSearch()
       }
       .width('100%')
@@ -32,7 +33,7 @@ export struct Home {
   //请求获取首页数据
   async requestHomeData() {
     let res = await httpUtil.get<HomeModel>(Api.homeInfo)
-    this.bannerList = res.bannerList
+    this.bannerSource.setList(res.bannerList)
     console.log('res == ', JSON.stringify(res))
   }
 }

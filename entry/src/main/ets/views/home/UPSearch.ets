@@ -33,12 +33,14 @@ export default struct UPSearch {
 
       //搜索输入文本框
       TextInput({placeholder: '公司/地铁/小区，马上搜索'})
+        .height('100%')
+        .layoutWeight(1)
+        .fontSize(12)
         .placeholderColor('#999')
         .placeholderFont({size:12})
         .backgroundColor(Color.Transparent)
         .padding({left: 0, right: 0})
         .caretColor('#999')
-        .layoutWeight(1)
 
       //竖直分割线
       Line()

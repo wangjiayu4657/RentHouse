@@ -1,5 +1,5 @@
 import Api from '../../service/http/Api'
-import { HomeModel } from '../../models/home/homeModel'
+import { HomeModel } from '../../models/home/HomeModel'
 import httpUtil from '../../service/http/http'
 
 

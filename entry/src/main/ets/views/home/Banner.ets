@@ -1,13 +1,17 @@
-import { BannerItem, BannerList } from '../../models/home/homeModel'
+import { BannerItem } from '../../models/home/HomeModel'
+import { BannerDataSource } from '../../models/home/BannerDataSource'
 
 @Component
 export struct Banner {
-  @Prop bannerList: BannerList
+  @ObjectLink bannerSource: BannerDataSource
 
   build() {
     Swiper() {
-      ForEach(this.bannerList, (banner: BannerItem) => {
+      LazyForEach(this.bannerSource, (banner: BannerItem) => {
         Image(banner.imageURL)
+          .width('100%')
+          .height('100%')
+          .objectFit(ImageFit.Fill)
       }, (item: BannerItem) => item.id.toString())
     }
     .width('100%')
