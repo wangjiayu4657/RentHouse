@@ -15,7 +15,6 @@ export struct Banner {
       }, (item: BannerItem) => item.id.toString())
     }
     .width('100%')
-    .height(211)
     .loop(true)
     .autoPlay(true)
     .indicator(Indicator.dot().color('#cccbcb').selectedColor($r('app.color.primary')))

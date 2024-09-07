@@ -5,7 +5,7 @@
       "value": "#FFFFFF"
     },
     {
-      "name": "bg_gray",
+      "name": "bg_color",
       "value": "#f7f7f7"
     },
     {
@@ -21,7 +21,7 @@
       "value": "#36d1a1"
     },
     {
-      "name": "shadow",
+      "name": "shadowColor",
       "value": "#24000000"
     },
     {

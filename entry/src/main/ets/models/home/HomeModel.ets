@@ -39,3 +39,22 @@ export interface PlanItem {
   imageURL: string
 }
 export type PlanList = PlanItem[]
+
+//房间优势描述信息
+export interface TagItem {
+  name: string
+}
+export type TagList = TagItem[]
+
+//房间信息
+export interface RoomItem {
+  id: string               //id
+  housePicture: string     //房间图片
+  tags: TagList            //房间优势描述信息
+  houseTitle: string       //房间出租方式描述标题
+  address: string          //房间地址
+  rentPriceUnit: string    //房间价格单位
+  rentPriceListing: string //房间价格
+  rentArea: string         //房间面积
+}
+export type RoomList = RoomItem[]
