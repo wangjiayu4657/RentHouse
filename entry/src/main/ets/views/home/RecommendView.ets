@@ -1,11 +1,12 @@
 import { RoomItem, RoomList, TagItem } from '../../models/home/HomeModel'
+import { RecommendDataSource } from '../../models/home/RecommendDataSource'
 import Api from '../../service/http/Api'
 import httpUtil from '../../service/http/http'
 
+
 @Component
-@Preview
 export default struct RecommendView {
-  @State roomList: RoomList = []
+  @State rDataSource:RecommendDataSource = new RecommendDataSource()
 
   aboutToAppear(): void {
     this.requestRoomInfoData()
@@ -56,7 +57,7 @@ export default struct RecommendView {
   @Builder
   bodyBuilder() {
     Grid() {
-      ForEach(this.roomList, (item: RoomItem) => {
+      LazyForEach(this.rDataSource, (item: RoomItem) => {
         GridItem() {
           this.gridItemBuilder(item)
         }
@@ -73,12 +74,12 @@ export default struct RecommendView {
 
   //自定义 grid item 组件
   @Builder
-  gridItemBuilder(item: RoomItem) {
+  gridItemBuilder($: RoomItem ) {
     Column() {
       //房间图片
-      this.roomPictureBuild(item)
+      this.roomPictureBuild($)
       //房间信息
-      this.roomInfoBuilder(item)
+      this.roomInfoBuilder($)
     }
     .width('100%')
   }
@@ -140,7 +141,7 @@ export default struct RecommendView {
           if (idx == 0) {
             Button(tag.name).btnStyle(Color.White, $r('app.color.primary'))
           } else {
-            Button(this.getTagName(tag.name)).btnStyle('#B3B3B3', $r('app.color.bg_color'))
+            Button(tag.name).btnStyle('#B3B3B3', $r('app.color.bg_color'))
           }
         }, (tag: string) => tag)
       }
@@ -153,14 +154,10 @@ export default struct RecommendView {
     .borderRadius({ bottomLeft: 8, bottomRight: 8 })
   }
 
-  getTagName(tag: string) {
-    console.log('tag ==', JSON.stringify(tag))
-    return tag
-  }
-
+  //请求数据房源推荐信息
   async requestRoomInfoData() {
     let roomList = await httpUtil.get<RoomList>(Api.roomInfo)
-    this.roomList = roomList
+    this.rDataSource.setList(roomList)
   }
 }
 
