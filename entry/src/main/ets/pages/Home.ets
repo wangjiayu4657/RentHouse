@@ -23,15 +23,15 @@ export struct Home {
   }
 
   build() {
-    // Stack() {
+    Stack() {
       //滚动画布
       this.scrollBuilder()
       //搜索栏
-    //   UPSearch()
-    // }
-    // .width('100%')
-    // .height('100%')
-    // .alignContent(Alignment.Top)
+      UPSearch()
+    }
+    .width('100%')
+    .height('100%')
+    .alignContent(Alignment.Top)
   }
 
   @Builder
@@ -79,8 +79,7 @@ export struct Home {
         //推荐房源
         RecommendView()
           .width('100%')
-          .backgroundColor($r('app.color.bg_color'))
-          .height(210 * 4 + 8 * 3 + 44 + 16 + 60)
+          .height(210 * 4 + 12 * 3 + 44 + 16)
       }
       .width('100%')
       .backgroundColor(Color.White)
@@ -88,10 +87,8 @@ export struct Home {
     .width('100%')
     .height('100%')
     .align(Alignment.Top)
+    .padding({bottom: 10})
     .backgroundColor(Color.Orange)
-    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP])
-    .backgroundImageSize(ImageSize.Auto)
-    .visibility(Visibility.Visible)
   }
 
   //请求获取首页数据

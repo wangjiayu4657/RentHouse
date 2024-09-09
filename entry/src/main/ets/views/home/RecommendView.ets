@@ -18,7 +18,6 @@ export default struct RecommendView {
     }
     .width('100%')
     .height('100%')
-    .padding({ bottom: 90 })
     .backgroundColor($r('app.color.bg_color'))
   }
 
@@ -61,16 +60,15 @@ export default struct RecommendView {
         GridItem() {
           this.gridItemBuilder(item)
         }
-        .backgroundColor($r('app.color.bg_color'))
       }, (item: RoomItem) => item.id)
     }
     .width('100%')
     .columnsTemplate('1fr 1fr')
     .columnsGap(8)
-    .rowsTemplate('1fr 1fr 1fr 1fr')
-    .rowsGap(15)
-    .backgroundColor($r('app.color.bg_color'))
+    .rowsGap(12)
     .padding({ left: 15, right: 15 })
+    .backgroundColor($r('app.color.bg_color'))
+    .enabled(false)
   }
 
   //自定义 grid item 组件
