@@ -13,7 +13,6 @@ export default struct TileView {
       }, (tileItem:TileItem) => tileItem.id + '')
     }
     .width('100%')
-    .height(80)
     .columnsTemplate('1fr 1fr')
     .columnsGap(15)
     .scrollBar(BarState.Off)
@@ -24,7 +23,7 @@ export default struct TileView {
   gridItemBuilder(tileItem:TileItem) {
     Column({space : 10}) {
       Image(tileItem.imageURL)
-        .height(58)
+        .width('100%')
         .objectFit(ImageFit.Fill)
 
       Row({space: 5}) {
@@ -41,5 +40,6 @@ export default struct TileView {
       .width('100%')
       .padding({left: 4})
     }
+    // .backgroundColor(Color.Blue)
   }
 }

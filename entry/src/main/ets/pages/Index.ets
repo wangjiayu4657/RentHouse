@@ -10,7 +10,7 @@ struct Index {
   @State curIdx: number = 0;
 
   build() {
-    Tabs({barPosition: BarPosition.End}) {
+    Tabs({ barPosition: BarPosition.End }) {
       TabContent() {
         Home()
       }.tabBar(this.tabItemBuilder('app.media.tabbar_home', '首页', 0))
@@ -40,6 +40,7 @@ struct Index {
     .height('100%')
     .scrollable(false)
     .animationDuration(0)
+    .padding({ bottom: 20 })
     .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP])
     .onChange((idx: number) => {
       this.curIdx = idx

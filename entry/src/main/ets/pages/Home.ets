@@ -8,6 +8,7 @@ import NavView from '../views/home/NavView';
 import TileView from '../views/home/TileView';
 import PlanView from '../views/home/PlanView';
 import RecommendView from '../views/home/RecommendView';
+import { NavInfo, ScrollContainer } from '../components/ScrollContainer';
 
 
 @Component
@@ -23,72 +24,68 @@ export struct Home {
   }
 
   build() {
-    Stack() {
-      //滚动画布
-      this.scrollBuilder()
-      //搜索栏
-      UPSearch()
-    }
-    .width('100%')
-    .height('100%')
-    .alignContent(Alignment.Top)
+    ScrollContainer({
+      navParamBuilder: this.searchBuilder,
+      bodyParamBuilder: () => {
+        this.bodyBuilder()
+      }
+    })
+      .width('100%')
+      .height('100%')
   }
 
   @Builder
-  scrollBuilder() {
-    //滚动画布
-    Scroll() {
-      Column({ space: 20 }) {
-        //banner
-        Banner({ bannerSource: this.bannerSource })
-          .width('100%')
-          .height(212)
+  searchBuilder($: NavInfo) {
+    UPSearch({ fontColor: $.fontColor})
+  }
 
-        Column({ space: 20 }) {
-          //navView
-          NavView({ navList: this.navList })
-            .width('100%')
-            .height(170)
-
-          //tileView
-          TileView({ tileList: this.tileList })
-            .width('100%')
-            .height(80)
-            .margin({ top: 10 })
-
-          //planView
-          PlanView({ planList: this.planList })
-            .width('100%')
-            .height(60)
-
-          //广告图标
-          Image(this.imgUrl)
-            .width('100%')
-            .height(60)
-            .shadow({
-              offsetX: 0,
-              offsetY: 0,
-              radius: 8,
-              color: $r('app.color.shadowColor'),
-            })
-        }
+  @Builder
+  bodyBuilder() {
+    Column({ space: 20 }) {
+      //轮播图组件
+      Banner({ bannerSource: this.bannerSource })
         .width('100%')
-        .padding({ left: 15, right: 15 })
-        .visibility(Visibility.Visible)
+        .height(212)
 
-        //推荐房源
-        RecommendView()
+      //navView
+      NavView({ navList: this.navList })
+        .width('100%')
+        .height(170)
+
+      Column({ space: 20 }) {
+        //tileView
+        TileView({ tileList: this.tileList })
           .width('100%')
-          .height(210 * 4 + 12 * 3 + 44 + 16)
+          .height(100)
+          .margin({ top: 10 })
+
+        //计划组件
+        PlanView({ planList: this.planList })
+          .width('100%')
+          .height(60)
+
+        //广告图标
+        Image(this.imgUrl)
+          .width('100%')
+          .height(60)
+          .shadow({
+            offsetX: 0,
+            offsetY: 0,
+            radius: 8,
+            color: $r('app.color.shadowColor'),
+          })
       }
       .width('100%')
-      .backgroundColor(Color.White)
+      .padding({ left: 15, right: 15 })
+      .visibility(Visibility.Visible)
+
+      //推荐房源
+      RecommendView()
+        .width('100%')
+        .height(210 * 4 + 12 * 3 + 44 + 16)
     }
     .width('100%')
-    .height('100%')
-    .align(Alignment.Top)
-    .padding({bottom: 10})
-    .backgroundColor(Color.Orange)
+    .backgroundColor(Color.White)
   }
 
   //请求获取首页数据
@@ -99,6 +96,5 @@ export struct Home {
     this.tileList = res.tileList
     this.planList = res.planList
     this.imgUrl = res.adPicture
-    console.log('res == ', JSON.stringify(res.planList))
   }
 }

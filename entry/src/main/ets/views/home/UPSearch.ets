@@ -1,12 +1,13 @@
-
 @Component
 export default struct UPSearch {
+  @Prop fontColor:ResourceStr | Color = Color.White
+
   build() {
-    Row({space: 12}) {
+    Row({ space: 12 }) {
       //地名
       Text('北京')
         .fontSize(14)
-        .fontColor(Color.White)
+        .fontColor(this.fontColor)
         .fontWeight(FontWeight.Bold)
 
       //搜索框
@@ -16,30 +17,30 @@ export default struct UPSearch {
       Image($r('app.media.message'))
         .width(24)
         .aspectRatio(1)
-        .fillColor(Color.White)
+        .fillColor(this.fontColor)
     }
     .width('100%')
     .height(56)
-    .padding({left: 15, right: 15})
+    .padding({ left: 15, right: 15 })
   }
 
   @Builder
   searchBuilder() {
-    Row({space: 12}) {
+    Row({ space: 12 }) {
       //搜索左侧图标
       Image($r('app.media.search'))
         .width(18)
         .aspectRatio(1)
 
       //搜索输入文本框
-      TextInput({placeholder: '公司/地铁/小区，马上搜索'})
+      TextInput({ placeholder: '公司/地铁/小区，马上搜索' })
         .height('100%')
         .layoutWeight(1)
         .fontSize(12)
         .placeholderColor('#999')
-        .placeholderFont({size:12})
+        .placeholderFont({ size: 12 })
         .backgroundColor(Color.Transparent)
-        .padding({left: 0, right: 0})
+        .padding({ left: 0, right: 0 })
         .caretColor('#999')
 
       //竖直分割线
@@ -56,7 +57,7 @@ export default struct UPSearch {
     .height(38)
     .layoutWeight(1)
     .borderRadius(19)
-    .padding({left: 15, right: 15})
+    .padding({ left: 15, right: 15 })
     .backgroundColor(Color.White)
   }
 }

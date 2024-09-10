@@ -74,7 +74,7 @@ export default struct RecommendView {
 
   //自定义 grid item 组件
   @Builder
-  gridItemBuilder($: RoomItem ) {
+  gridItemBuilder($: RoomItem) {
     Column() {
       //房间图片
       this.roomPictureBuild($)

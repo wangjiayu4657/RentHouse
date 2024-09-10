@@ -18,6 +18,7 @@ export default struct NavView {
     }
     .width('100%')
     .height('100%')
+    .padding({left: 4, right: 4})
     .backgroundColor(Color.White)
   }
 
