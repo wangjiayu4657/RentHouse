@@ -17,8 +17,7 @@ export class RecommendDataSource implements IDataSource {
     return this.dataSource[index]
   }
 
-  //自定义函数
-  //添加单条数据
+  //添加单条数据(自定义函数)
   setData(item:RoomItem) {
     if(this.dataSource.indexOf(item) < 0) {
       this.dataSource.push(item)
@@ -26,8 +25,7 @@ export class RecommendDataSource implements IDataSource {
     }
   }
 
-  //自定义函数
-  //更新全部数据
+  //更新全部数据(自定义函数)
   setList(list:RoomList) {
     this.dataSource = list
     this.notifyOnAllDataReload()
