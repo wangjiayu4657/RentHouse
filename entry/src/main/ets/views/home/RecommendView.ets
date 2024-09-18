@@ -1,7 +1,7 @@
 import { RoomItem, RoomList, TagItem } from '../../models/home/HomeModel'
 import { RecommendDataSource } from '../../models/home/RecommendDataSource'
 import Api from '../../service/http/Api'
-import httpUtil from '../../service/http/http'
+import httpUtil from '../../service/http/HttpUtil'
 
 
 @Component

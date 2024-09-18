@@ -5,4 +5,7 @@ export default class Api {
 
   //首页房源信息接口
   static readonly roomInfo:string = '/house/nearbyHouses'
+
+  //服务页信息接口
+  static readonly serviceInfo:string = '/service/info'
 }

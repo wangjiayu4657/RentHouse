@@ -1,4 +1,4 @@
-
+import VerticalItem from '../components/VerticalItem';
 
 @Preview
 @Component
@@ -35,27 +35,13 @@ export struct ToSee {
       }
 
       Row({ space: 28 }) {
-        this.headerItemBuilder($r('app.media.message'), '消息')
-        this.headerItemBuilder($r('app.media.journey'), '行程')
+        VerticalItem({img: $r('app.media.message'), name: '消息'})
+        VerticalItem({img: $r('app.media.journey'), name: '行程'})
       }
     }
     .width('100%')
     .padding({ left: 15, right: 15 })
     .justifyContent(FlexAlign.SpaceBetween)
-  }
-
-  @Builder
-  headerItemBuilder(img: ResourceStr, msg: string) {
-    Column({ space: 4 }) {
-      Image(img)
-        .width(20)
-        .fillColor(Color.Black)
-
-      Text(msg)
-        .fontSize(10)
-        .fontWeight(FontWeight.Medium)
-        .fontColor(Color.Black)
-    }
   }
 
   @Builder

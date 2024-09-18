@@ -1,6 +1,6 @@
 import Api from '../../service/http/Api'
 import { HomeModel } from '../../models/home/HomeModel'
-import httpUtil from '../../service/http/http'
+import httpUtil from '../../service/http/HttpUtil'
 
 
 class HomeViewModel {

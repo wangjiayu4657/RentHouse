@@ -1,6 +1,6 @@
 import Api from '../service/http/Api'
 import { HomeModel, NavList, PlanList, TileList } from '../models/home/HomeModel'
-import httpUtil from '../service/http/http'
+import httpUtil from '../service/http/HttpUtil'
 import { Banner } from '../views/home/Banner';
 import UPSearch from '../views/home/UPSearch';
 import { BannerDataSource } from '../models/home/BannerDataSource';
