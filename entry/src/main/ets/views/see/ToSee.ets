@@ -1,9 +1,7 @@
-import VerticalItem from '../components/VerticalItem';
+import VerticalItem from '../../components/VerticalItem';
 
-@Preview
 @Component
 export struct ToSee {
-  @State message: string = 'To See';
   @StorageProp('statusBarHeight') statusBarHeight: number = 0
 
   build() {

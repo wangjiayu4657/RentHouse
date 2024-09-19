@@ -1,14 +1,14 @@
-import Api from '../service/http/Api'
-import { HomeModel, NavList, PlanList, TileList } from '../models/home/HomeModel'
-import httpUtil from '../service/http/HttpUtil'
-import { Banner } from '../views/home/Banner';
-import UPSearch from '../views/home/UPSearch';
-import { BannerDataSource } from '../models/home/BannerDataSource';
-import NavView from '../views/home/NavView';
-import TileView from '../views/home/TileView';
-import PlanView from '../views/home/PlanView';
-import RecommendView from '../views/home/RecommendView';
-import { NavInfo, ScrollContainer } from '../components/ScrollContainer';
+import Api from '../../service/http/Api'
+import { HomeModel, NavList, PlanList, TileList } from '../../models/home/HomeModel'
+import httpUtil from '../../service/http/HttpUtil'
+import { Banner } from './Banner';
+import UPSearch from './UPSearch';
+import { BannerDataSource } from '../../models/home/BannerDataSource';
+import NavView from './NavView';
+import TileView from './TileView';
+import PlanView from './PlanView';
+import RecommendView from './RecommendView';
+import { NavInfo, ScrollContainer } from '../../components/ScrollContainer';
 
 
 @Component

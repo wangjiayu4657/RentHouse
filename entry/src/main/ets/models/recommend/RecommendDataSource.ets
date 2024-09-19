@@ -1,9 +1,9 @@
-import { RoomItem, RoomList } from './HomeModel'
+import { RecordItem, RecordList } from './RecommendModel'
 
 // @Observed
 export class RecommendDataSource implements IDataSource {
   //数据源
-  dataSource:RoomList = []
+  dataSource:RecordList = []
   //监听器数据源
   listenerList: DataChangeListener[] = []
 
@@ -13,12 +13,12 @@ export class RecommendDataSource implements IDataSource {
   }
 
   //获取单条数据
-  getData(index: number): RoomItem {
+  getData(index: number): RecordItem {
     return this.dataSource[index]
   }
 
   //添加单条数据(自定义函数)
-  setData(item:RoomItem) {
+  setData(item:RecordItem) {
     if(this.dataSource.indexOf(item) < 0) {
       this.dataSource.push(item)
       this.notifyOnDataAdd(this.dataSource.length - 1)
@@ -26,7 +26,7 @@ export class RecommendDataSource implements IDataSource {
   }
 
   //更新全部数据(自定义函数)
-  setList(list:RoomList) {
+  setList(list:RecordList) {
     this.dataSource = list
     this.notifyOnAllDataReload()
   }

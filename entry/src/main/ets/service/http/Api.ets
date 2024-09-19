@@ -8,4 +8,7 @@ export default class Api {
 
   //服务页信息接口
   static readonly serviceInfo:string = '/service/info'
+
+  //推荐房源信息接口
+  static readonly recommendInfo:string = '/house/search'
 }

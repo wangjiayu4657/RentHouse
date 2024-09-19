@@ -1,9 +1,9 @@
-import Api from '../service/http/Api';
-import httpUtil from '../service/http/HttpUtil'
-import ServiceTabBar from '../views/service/ServiceTabBar';
-import ServiceHeader from '../views/service/ServiceHeader';
-import { ServiceHomeCard } from '../views/service/ServiceHomeCard';
-import { ServiceCalendarCard } from '../views/service/ServiceCalendarCard';
+import Api from '../../service/http/Api';
+import httpUtil from '../../service/http/HttpUtil'
+import ServiceTabBar from './ServiceTabBar';
+import ServiceHeader from './ServiceHeader';
+import { ServiceHomeCard } from './ServiceHomeCard';
+import { ServiceCalendarCard } from './ServiceCalendarCard';
 import {
   CleaningServiceInfoList,
   HomeServiceList,
@@ -11,14 +11,9 @@ import {
   ServiceActivityItem,
   ServiceModel,
   VipServiceList
-} from '../models/service/ServiceModel';
+} from '../../models/service/ServiceModel';
 
 
-@Styles function cardStyle() {
-  .backgroundColor(Color.White)
-}
-
-@Preview
 @Component
 export struct Service {
   @StorageProp('statusBarHeight') statusBarHeight: number = 0

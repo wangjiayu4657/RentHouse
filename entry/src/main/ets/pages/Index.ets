@@ -1,8 +1,8 @@
-import { Discover } from './Discover';
-import { Home } from './Home';
-import { Profile } from './Profile';
-import { Service } from './Service';
-import { ToSee } from './ToSee';
+import { Discover } from '../views/discover/Discover';
+import { Home } from '../views/home/Home';
+import { Profile } from '../views/profile/Profile';
+import { Service } from '../views/service/Service';
+import { ToSee } from '../views/see/ToSee';
 
 @Entry
 @Component
