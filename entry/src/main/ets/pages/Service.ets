@@ -1,7 +1,7 @@
 import Api from '../service/http/Api';
-import ServiceHeader from '../views/service/ServiceHeader';
 import httpUtil from '../service/http/HttpUtil'
-import ServiceNewbieZone from '../views/service/ServiceNewbieZoneCard';
+import ServiceTabBar from '../views/service/ServiceTabBar';
+import ServiceHeader from '../views/service/ServiceHeader';
 import { ServiceHomeCard } from '../views/service/ServiceHomeCard';
 import { ServiceCalendarCard } from '../views/service/ServiceCalendarCard';
 import {
@@ -12,7 +12,7 @@ import {
   ServiceModel,
   VipServiceList
 } from '../models/service/ServiceModel';
-import ServiceCleanHouse from '../views/service/ServiceCleanHouseCard';
+
 
 @Styles function cardStyle() {
   .backgroundColor(Color.White)
@@ -51,15 +51,9 @@ export struct Service {
             .borderRadius(8)
             .backgroundColor(Color.White)
 
-          //新人专区组件
-          ServiceNewbieZone({ newcomerZoneItem: this.newcomerZoneItem })
-            .borderRadius(8)
-            .backgroundColor(Color.White)
+          ServiceTabBar({newcomerZoneItem: this.newcomerZoneItem, cleanServiceInfoList: this.cleanServiceInfoList})
+            .margin({top: 10})
 
-          //洁净家组件
-          ServiceCleanHouse({ cleanServiceInfoList: this.cleanServiceInfoList })
-            .borderRadius(8)
-            .backgroundColor(Color.White)
         }
         .padding({ bottom: 30 })
         .backgroundColor('#F9F9F9')

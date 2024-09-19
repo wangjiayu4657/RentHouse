@@ -1,18 +1,19 @@
-import { ServiceActivityItem } from '../../models/service/ServiceModel'
 import ServiceCardHeader from './ServiceCardHeader'
+import { getCurrentMonth, getMonths } from '../../utils/DateUtil'
+import { ServiceActivityItem } from '../../models/service/ServiceModel'
 
 //服务日历组件
 @Component
 export struct ServiceCalendarCard {
-  @State idx: number = 0
-  @State month: number = 0
-  @State scaleFont: number = 14
-
+  @State curMonthIdx: number = 0
   @Prop serviceActivity: ServiceActivityItem
 
-  private months: string[] = ['10', '11', '12', '01', '02', '03']
-  private titles: string[] = ['会员精选', '居家保洁', '深层清洗', '新居乔迁']
-  private subTitles: string[] = ['专业服务', '解放双手', '高温蒸洗', '一站搬家']
+  private months: string[] = getMonths()
+
+  aboutToAppear(): void {
+    let curMonth = getCurrentMonth()
+    this.curMonthIdx = this.months.indexOf(curMonth.toString())
+  }
 
   build() {
     Column() {
@@ -21,17 +22,18 @@ export struct ServiceCalendarCard {
         .width('100%')
         .padding(12)
 
-      this.ServiceCardBodyBuilder()
+      this.serviceCardBodyBuilder()
     }
     .width('100%')
   }
 
   @Builder
-  ServiceCardBodyBuilder() {
+  serviceCardBodyBuilder() {
     Column() {
+      //卡片头部组件
       this.cardHeaderBuilder()
+      //卡片内容组件
       this.cardBodyBuilder()
-      this.cardFooterBuilder()
     }
   }
 
@@ -52,9 +54,9 @@ export struct ServiceCalendarCard {
         }
         .padding(8)
         .borderRadius(4)
-        .backgroundColor(this.month == idx ? '#CDFFD9' : '#FFFFFF')
+        .backgroundColor(this.curMonthIdx == idx ? '#CDFFD9' : '#FFFFFF')
         .onClick(() => {
-          this.month = idx
+          this.curMonthIdx = idx
         })
       })
     }
@@ -106,53 +108,16 @@ export struct ServiceCalendarCard {
           .alignSelf(ItemAlign.End)
       }
       .width('100%')
+      .padding({top: 4})
       .alignItems(VerticalAlign.Top)
       .justifyContent(FlexAlign.SpaceAround)
     }
     .width('100%')
     .height(140)
-    .padding({ top: 8, left: 12, bottom: 8, right: 12 })
+    .padding({ top: 16, left: 12, bottom: 8, right: 12 })
     .margin({top: 12, bottom: 22})
     .alignItems(HorizontalAlign.Start)
     .backgroundImage($r("app.media.service_calendar_bg"))
     .backgroundImageSize(ImageSize.FILL)
-
-  }
-
-  @Builder
-  cardFooterBuilder() {
-    Row({space: 20}) {
-      ForEach(this.titles, (item: string, idx: number) => {
-        this.cardFooterItemBuilder(item, idx)
-      })
-    }
-    .width('100%')
-    .padding({left: 12, right: 12, bottom: 12})
-    .justifyContent(FlexAlign.SpaceBetween)
-  }
-
-  @Builder
-  cardFooterItemBuilder(title: string, idx: number) {
-    Column({ space: 4 }) {
-      Text(title)
-        .fontSize(this.idx == idx ? 18 : 14)
-        .fontColor('#000')
-        .fontWeight(FontWeight.Bold)
-
-      Text(this.subTitles[idx])
-        .fontSize(12)
-        .fontColor('#666')
-        .fontWeight(FontWeight.Medium)
-
-      if (this.idx == idx) {
-        Line()
-          .width(20)
-          .height(4)
-          .backgroundColor('#51BB9E')
-      }
-    }
-    .onClick(() => {
-      this.idx = idx
-    })
   }
 }
