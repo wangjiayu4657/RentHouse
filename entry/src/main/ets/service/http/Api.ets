@@ -11,4 +11,11 @@ export default class Api {
 
   //推荐房源信息接口
   static readonly recommendInfo:string = '/house/search'
+
+  //推荐房源省份位置信息接口
+  static readonly provinceInfo:string = '/province'
+  //推荐房源市位置信息接口
+  static readonly cityInfo:string = '/city'
+  //推荐房源区位置信息接口
+  static readonly districtInfo:string = '/area'
 }

@@ -2,11 +2,11 @@ import VerticalItem from './VerticalItem'
 
 @Component
 export struct HeaderView {
-  @Builder leadBuilder() {}
-  @BuilderParam leadViewBuilder: () => void = this.leadBuilder
-
-  @Builder tailBuilder() {}
-  @BuilderParam tailViewBuilder: () => void = this.tailBuilder
+  // @Builder leadBuilder() {}
+  // @BuilderParam leadParamBuilder: () => void = this.leadBuilder
+  //
+  // @Builder tailBuilder() {}
+  // @BuilderParam tailParamBuilder: () => void = this.tailBuilder
 
   build() {
     Row() {

@@ -1,8 +1,10 @@
 import axios, { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from '@ohos/axios'
 import { promptAction } from '@kit.ArkUI'
+import { JSON } from '@kit.ArkTS'
 
 const request = axios.create({
   baseURL: 'http://172.30.89.196:6060',
+  // baseURL: 'http://192.168.2.106:6060',
   timeout: 20000
 })
 
@@ -32,7 +34,7 @@ request.interceptors.response.use((response: AxiosResponse) => {
 
 
 class HttpUtil {
-  get<T>(url: string, params?: Object) {
+  get<T>(url: string, params?: Object ) {
     return request.get<null, T>(url, { params })
   }
 

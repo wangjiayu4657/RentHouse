@@ -1,16 +1,17 @@
-import NavigationBar from '../../components/NavigationBar';
-import httpUtil from '../../service/http/HttpUtil'
-import { ActivityItem, RecommendModel, recommendParams, RecordItem } from '../../models/recommend/RecommendModel'
 import Api from '../../service/http/Api';
-import { RecommendDataSource } from '../../models/recommend/RecommendDataSource';
+import httpUtil from '../../service/http/HttpUtil'
 import RoomCard from '../../views/home/RoomCard';
-
+import NavigationBar from '../../components/NavigationBar';
+import FilterCriteria from '../../views/recommend/FilterCriteria'
+import { RecommendDataSource } from '../../models/recommend/RecommendDataSource';
+import { ActivityItem, RecommendModel, recommendParams, RecordItem } from '../../models/recommend/RecommendModel'
 
 @Entry
 @Component
 struct RecommendPage {
   @StorageProp('statusBarHeight') statusBarHeight: number = 0
   @State dataSource: RecommendDataSource = new RecommendDataSource()
+  @State zIdx: number = 0
 
   aboutToAppear(): void {
     this.requestRecommendData()
@@ -19,35 +20,24 @@ struct RecommendPage {
   build() {
     Column() {
       //导航
-      NavigationBar({ title: '房源推荐' })
-        .width('100%')
-        .height(44 + this.statusBarHeight)
-        .padding({ top: this.statusBarHeight })
-
+      this.navigationBarBuilder()
       //筛选项
       this.filterItemBuilder()
-
       //瀑布流
-      WaterFlow() {
-        LazyForEach(this.dataSource, (item: RecordItem) => {
-          FlowItem() {
-            this.flowItemBuilder(item)
-          }
-          .width('100%')
-          .height(item.activity ? 320 : 210)
-        }, (item: RecordItem) => item.id)
-      }
-      .width('100%')
-      .layoutWeight(1)
-      .columnsTemplate('1fr 1fr')
-      .columnsGap(8)
-      .rowsGap(8)
-      .padding({ top: 20, bottom: 20 })
+      this.recommendBodyBuilder()
     }
     .width('100%')
     .height('100%')
-    .padding({ left: 15, right: 15 })
     .backgroundColor('#F7F7F7')
+  }
+
+  @Builder
+  navigationBarBuilder() {
+    NavigationBar({ title: '房源推荐' })
+      .width('100%')
+      .height(44 + this.statusBarHeight)
+      .padding({ top: this.statusBarHeight })
+      .backgroundColor(Color.White)
   }
 
   //筛选项
@@ -68,11 +58,63 @@ struct RecommendPage {
             .objectFit(ImageFit.Contain)
             .padding({ bottom: 4 })
         }
+        .onClick(() => {
+          this.zIdx = 2
+        })
       })
     }
     .width('100%')
-    .padding({ top: 15, left: 15, right: 15 })
+    .height(40)
+    .padding(15)
     .justifyContent(FlexAlign.SpaceBetween)
+    .backgroundColor(Color.White)
+  }
+
+  @Builder
+  recommendBodyBuilder() {
+    Stack() {
+      this.filterOptionBuilder()
+      this.recommendRoomBuilder()
+    }
+    .layoutWeight(1)
+    .backgroundColor('#F7F7F7')
+  }
+
+  @Builder
+  filterOptionBuilder() {
+    Column() {
+      FilterCriteria()
+        .width('100%')
+        .height('100%')
+    }
+    .width('100%')
+    .layoutWeight(1)
+    .backgroundColor('#b3000000')
+    .zIndex(this.zIdx)
+    .onClick(() => {
+      this.zIdx = 0
+    })
+  }
+
+  @Builder
+  recommendRoomBuilder() {
+    WaterFlow() {
+      LazyForEach(this.dataSource, (item: RecordItem) => {
+        FlowItem() {
+          this.flowItemBuilder(item)
+        }
+        .width('100%')
+        .height(item.activity ? 320 : 210)
+      }, (item: RecordItem) => item.id)
+    }
+    .width('100%')
+    .layoutWeight(1)
+    .columnsTemplate('1fr 1fr')
+    .columnsGap(8)
+    .rowsGap(8)
+    .padding({ top: 20, left: 15, bottom: 20, right: 15 })
+    .backgroundColor('#F7F7F7')
+    .zIndex(1)
   }
 
   //瀑布流 item
@@ -106,7 +148,7 @@ struct RecommendPage {
         .fontColor(item.activity.textColor)
         .fontWeight(FontWeight.Bold)
         .borderRadius(4)
-        .margin({top : 4, bottom: 4})
+        .margin({ top: 4, bottom: 4 })
         .padding({ top: 4, left: 8, bottom: 4, right: 8 })
         .backgroundColor(item.activity.textBackGroundColor)
     }
@@ -119,7 +161,6 @@ struct RecommendPage {
     let params: recommendParams = { 'page': 1, 'limit': 10 }
     const rsp = await httpUtil.get<RecommendModel>(Api.recommendInfo, params)
     this.dataSource.setList(rsp.records)
-    console.log(JSON.stringify(rsp))
   }
 
   //处理数据
@@ -128,3 +169,4 @@ struct RecommendPage {
     return Reflect.get(item, '#text')
   }
 }
+

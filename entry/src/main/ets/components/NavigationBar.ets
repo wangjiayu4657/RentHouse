@@ -15,7 +15,7 @@ export default struct NavigationBar {
           left: { anchor: '__container__', align: HorizontalAlign.Start },
           center: { anchor: '__container__', align: VerticalAlign.Center }
         })
-        .offset({ x: 15 })
+        .offset({ x: 10 })
         .onClick(() => router.back())
 
       Text(this.title)
@@ -28,7 +28,7 @@ export default struct NavigationBar {
           middle: { anchor: '__container__', align: HorizontalAlign.Center }
         })
     }
-    .height('100%')
     .width('100%')
+    .height('100%')
   }
 }
