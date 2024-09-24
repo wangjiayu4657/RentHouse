@@ -5,20 +5,28 @@ import NavigationBar from '../../components/NavigationBar';
 import FilterCriteria from '../../views/recommend/FilterCriteria'
 import { RecommendDataSource } from '../../models/recommend/RecommendDataSource';
 import { ActivityItem, RecommendRoomModel, recommendParams, RecordItem } from '../../models/recommend/RecommendRoomModel'
+import { AddressParam } from '../../models/recommend/RecommendAddressModel';
+
 
 @Entry
 @Component
 struct RecommendPage {
-  @StorageProp('statusBarHeight') statusBarHeight: number = 0
-  @State dataSource: RecommendDataSource = new RecommendDataSource()
-  @State zIdx: number = 0
-  @State page: number = 1
-  @State total: number = 0
-  @State isRefreshing: boolean = true
-  @State isShowRefreshIcon: boolean = true
+  @StorageProp('statusBarHeight') statusBarHeight: number = 0  //状态栏高度
+  @State dataSource: RecommendDataSource = new RecommendDataSource()  //懒加载数据源
+  @State page: number = 1       //分页查询页码
+  @State total: number = 0      //总数据
+
+  @State isShowRefresh: boolean = true  //是否显示刷新
+  @State isNoData:boolean = false       //是否为空数据
+
+  @State isShowAddressFilter:boolean = false  //是否显示地址筛选条件
+  @State pSelIdx:number = 0  //选中的省份
+  @State cSelIdx:number = 0  //选中的城市
+  @State dSelIdx:number = 0  //选中的县区
+
 
   aboutToAppear(): void {
-    this.requestRecommendData(1)
+    this.requestRecommendData(this.page)
   }
 
   build() {
@@ -63,7 +71,8 @@ struct RecommendPage {
             .padding({ bottom: 4 })
         }
         .onClick(() => {
-          this.zIdx = 2
+          if(this.isShowAddressFilter) return
+          this.isShowAddressFilter = true
         })
       })
     }
@@ -77,8 +86,15 @@ struct RecommendPage {
   @Builder
   recommendBodyBuilder() {
     Stack() {
-      this.filterOptionBuilder()
       this.recommendRoomBuilder()
+
+      if (this.isNoData) {
+        this.emptyBuilder()
+      }
+
+      if(this.isShowAddressFilter) {
+        this.filterOptionBuilder()
+      }
     }
     .layoutWeight(1)
     .backgroundColor('#F7F7F7')
@@ -87,16 +103,37 @@ struct RecommendPage {
   @Builder
   filterOptionBuilder() {
     Column() {
-      FilterCriteria()
+      FilterCriteria({
+        pSelIdx: this.pSelIdx,
+        cSelIdx: this.cSelIdx,
+        dSelIdx: this.dSelIdx,
+        onEmptyClick: () => {
+          this.isShowAddressFilter = false
+        },
+        onResetClick: () => {
+          this.pSelIdx = 0
+          this.cSelIdx = 0
+          this.dSelIdx = 0
+          this.isShowAddressFilter = false
+          this.requestRecommendData(this.page, undefined)
+        },
+        onCheckClick: (address:AddressParam) => {
+          // console.log('address -- ', JSON.stringify(address))
+          this.pSelIdx = address.pSelIdx ?? 0
+          this.cSelIdx = address.cSelIdx ?? 0
+          this.dSelIdx = address.dSelIdx ?? 0
+          this.isShowAddressFilter = false
+          this.requestRecommendData(this.page, address)
+        }
+      })
         .width('100%')
         .height('100%')
     }
     .width('100%')
     .layoutWeight(1)
     .backgroundColor('#b3000000')
-    .zIndex(this.zIdx)
     .onClick(() => {
-      this.zIdx = 0
+      this.isShowAddressFilter = true
     })
   }
 
@@ -118,7 +155,6 @@ struct RecommendPage {
     .columnsGap(8)
     .backgroundColor('#F7F7F7')
     .padding({left: 15, right: 15})
-    .zIndex(1)
     .onReachEnd(() => {
       this.page++
       this.requestRecommendData(this.page)
@@ -127,21 +163,23 @@ struct RecommendPage {
 
   @Builder
   waterFlowFooterBuilder() {
-    if (this.isShowRefreshIcon) {
-     Row({space: 10}){
-       Refresh({ refreshing: true})
-       Text('加载中...').fontColor('#999999').padding({top: 4})
-     }
-     .width('100%')
-     .padding(15)
-     .backgroundColor('#F7F7F7')
-     .justifyContent(FlexAlign.Center)
-    } else {
-      Text('没有更多数据了~')
+    if(!this.isNoData) {
+      if (this.isShowRefresh) {
+        Row({ space: 10 }) {
+          Refresh({ refreshing: true })
+          Text('加载中...').fontColor('#999999').padding({ top: 4 })
+        }
         .width('100%')
         .padding(15)
-        .textAlign(TextAlign.Center)
         .backgroundColor('#F7F7F7')
+        .justifyContent(FlexAlign.Center)
+      } else {
+        Text('没有更多数据了~')
+          .width('100%')
+          .padding(15)
+          .textAlign(TextAlign.Center)
+          .backgroundColor('#F7F7F7')
+      }
     }
   }
 
@@ -177,34 +215,55 @@ struct RecommendPage {
         .fontWeight(FontWeight.Bold)
         .borderRadius(4)
         .margin({ top: 4, bottom: 4 })
-        .padding({
-          top: 4,
-          left: 8,
-          bottom: 4,
-          right: 8
-        })
+        .padding({ top: 4, left: 8, bottom: 4, right: 8 })
         .backgroundColor(item.activity.textBackGroundColor)
     }
     .width('100%')
     .alignItems(HorizontalAlign.Start)
   }
 
+  //空数据组件
+  @Builder
+  emptyBuilder() {
+    Column({space: 15}) {
+      Image($r('app.media.recommend_no_data'))
+        .width(180)
+        .fillColor('#999')
+
+      Text('暂无数据')
+        .fontSize(16)
+        .fontColor('#666')
+        .fontWeight(FontWeight.Medium)
+    }
+    .width('100%')
+    .height('100%')
+    .justifyContent(FlexAlign.Center)
+  }
+
   //请求房源推荐数据
-  async requestRecommendData(page: number) {
+  async requestRecommendData(page: number, address?:AddressParam) {
     if(this.dataSource.totalCount() != 0 && this.dataSource.totalCount() >= this.total) {
-      this.isShowRefreshIcon = false
+      this.isShowRefresh = false
       return
     }
 
-    let params: recommendParams = { 'page': page, 'limit': 10 }
+    let params: recommendParams = {
+      page: page,
+      limit: 10,
+      provinceCode: address?.provinceCode,
+      cityCode: address?.cityCode,
+      districtCode: address?.districtCode,
+    }
+
     const rsp = await httpUtil.get<RecommendRoomModel>(Api.recommendInfo, params)
     if(page == 1) { //刷新
       this.dataSource.setList(rsp.records)
     } else {        //翻页
       this.dataSource.pushList(rsp.records)
     }
-    this.isRefreshing = false
+
     this.total = Number(rsp.total)
+    this.isNoData = rsp.records.length == 0
   }
 
   //处理数据

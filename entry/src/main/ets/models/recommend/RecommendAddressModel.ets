@@ -32,6 +32,10 @@ export type DistrictList = DistrictItem[]
 export interface AddressParam {
   provinceCode:string
   cityCode:string
+  districtCode:string
+  pSelIdx?:number
+  cSelIdx?:number
+  dSelIdx?:number
 }
 
 //地址类型

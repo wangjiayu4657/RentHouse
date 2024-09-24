@@ -19,48 +19,84 @@ export default struct FilterCriteria {
   @State cityList: CityList = []
   @State districtList: DistrictList = []
 
-  @State pSelIdx: number = 0
-  @State cSelIdx: number = 0
-  @State dSelIdx: number = 0
+  @Prop pSelIdx: number = 0  //选中的省份
+  @Prop cSelIdx: number = 0  //选中的城市
+  @Prop dSelIdx: number = 0  //选中的县区
 
-  callBack: (param?: AddressParam) => void = (param?: AddressParam) => { }
+  addressParam:AddressParam = {provinceCode: '', cityCode: '', districtCode: ''}
+
+  //点击空白
+  onEmptyClick:VoidCallback = () => {}
+  //重置
+  onResetClick:VoidCallback = () => {}
+  //查看房源
+  onCheckClick:(search:AddressParam) => void = () => {}
 
   aboutToAppear(): void {
     this.requestAddressData(AddressType.province)
   }
 
   build() {
-    Row() {
-      //省份
-      this.addressList<ProvinceItem>({
-        list: this.provinceList,
-        type: AddressType.province,
-        color: '#F7F7F7'
-      })
+    Column() {
+      Row() {
+        //省份
+        this.addressPicker<ProvinceItem>({
+          list: this.provinceList,
+          type: AddressType.province,
+          color: '#F7F7F7'
+        })
 
-      //城市
-      this.addressList<CityItem>({
-        list: this.cityList,
-        type: AddressType.city,
-        color: '#EBEBEB'
-      })
+        //城市
+        this.addressPicker<CityItem>({
+          list: this.cityList,
+          type: AddressType.city,
+          color: '#EBEBEB'
+        })
 
-      //县区
-      this.addressList<DistrictItem>({
-        list: this.districtList,
-        type: AddressType.district,
-        color: '#E6E6E6'
-      })
+        //县区
+        this.addressPicker<DistrictItem>({
+          list: this.districtList,
+          type: AddressType.district,
+          color: '#E6E6E6'
+        })
+      }
+      .width('100%')
+      .height(330)
+      .backgroundColor(Color.White)
+      .justifyContent(FlexAlign.SpaceEvenly)
+
+      //操作按钮
+      Row({space: 20}) {
+        Button('重置')
+          .btnStyle('#666', '#F0F0F0')
+          .layoutWeight(1)
+          .onClick(() => {
+            this.onResetClick()
+          })
+
+        Button('查看房源')
+          .btnStyle('#fff', '#67C0A8')
+          .layoutWeight(2)
+          .onClick(() => {
+            this.onCheckClick(this.addressParam)
+          })
+      }
+      .width('100%')
+      .padding(15)
+      .backgroundColor('#F7F7F7')
+      .justifyContent(FlexAlign.SpaceBetween)
     }
     .width('100%')
-    .height(330)
-    .backgroundColor(Color.White)
-    .justifyContent(FlexAlign.SpaceEvenly)
+    .height('100%')
+    .onClick(() => {
+      this.onEmptyClick()
+    })
   }
 
   @Builder
-  addressList<T extends ProvinceItem>($: AddressInfo<T>) {
+  addressPicker<T extends ProvinceItem>($: AddressInfo<T>) {
     Column() {
+      //列表
       List() {
         ForEach($.list, (item: T, idx:number) => {
           ListItem() {
@@ -69,7 +105,8 @@ export default struct FilterCriteria {
               .fontColor(this.handlerTextColor($.type, idx))
               .fontWeight(FontWeight.Medium)
           }
-          .padding({ top: 10, bottom: 10 })
+          .width('100%')
+          .height(44)
           .onClick(() => this.handlerDidSelectedAddress($, idx))
         }, (item: T) => item.code)
       }
@@ -80,7 +117,7 @@ export default struct FilterCriteria {
     .height('100%')
     .layoutWeight(1)
     .backgroundColor($.color)
-    .padding({ top: 10, left: 15, bottom: 10, right: 15 })
+    .padding({ top: 10})
   }
 
   //处理选中/未选中时的文本颜色
@@ -108,8 +145,6 @@ export default struct FilterCriteria {
     } else {
       this.dSelIdx = idx
     }
-
-    this.callBack ? this.callBack() : null
   }
 
   //请求筛选位置数据
@@ -130,5 +165,24 @@ export default struct FilterCriteria {
     const cityCode = this.cityList[this.cSelIdx].code ?? ''
     const districtParam: DistrictItem = { 'cityCode': cityCode }
     this.districtList = await httpUtil.get<DistrictList>(Api.districtInfo, districtParam)
+
+    //获取选中的地址
+    this.addressParam.pSelIdx = this.pSelIdx
+    this.addressParam.provinceCode = this.provinceList[this.pSelIdx].code ?? ''
+
+    this.addressParam.cSelIdx = this.cSelIdx
+    this.addressParam.cityCode = this.cityList[this.cSelIdx].code ?? ''
+
+    this.addressParam.dSelIdx = this.dSelIdx
+    this.addressParam.districtCode = this.districtList[this.dSelIdx].code ?? ''
   }
+}
+
+@Extend(Button) function btnStyle(fontColor:ResourceColor, bgColor:ResourceColor) {
+  .type(ButtonType.Normal)
+  .fontSize(14)
+  .fontColor(fontColor)
+  .fontWeight(FontWeight.Medium)
+  .borderRadius(4)
+  .backgroundColor(bgColor)
 }
