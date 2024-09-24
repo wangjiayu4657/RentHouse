@@ -1,6 +1,6 @@
-import { RecordItem, RecordList } from './RecommendModel'
+import { RecordItem, RecordList } from './RecommendRoomModel'
 
-// @Observed
+//推荐房源懒加载数据源
 export class RecommendDataSource implements IDataSource {
   //数据源
   dataSource:RecordList = []
@@ -28,6 +28,11 @@ export class RecommendDataSource implements IDataSource {
   //更新全部数据(自定义函数)
   setList(list:RecordList) {
     this.dataSource = list
+    this.notifyOnAllDataReload()
+  }
+
+  pushList(list: RecordList) {
+    this.dataSource.push(...list)
     this.notifyOnAllDataReload()
   }
 

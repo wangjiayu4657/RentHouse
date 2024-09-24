@@ -3,7 +3,7 @@ import { RecommendDataSource } from '../../models/recommend/RecommendDataSource'
 import Api from '../../service/http/Api'
 import httpUtil from '../../service/http/HttpUtil'
 import { router } from '@kit.ArkUI'
-import { RecordList } from '../../models/recommend/RecommendModel'
+import { RecordList } from '../../models/recommend/RecommendRoomModel'
 import RoomCard from './RoomCard'
 
 

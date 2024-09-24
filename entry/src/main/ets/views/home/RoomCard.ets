@@ -83,7 +83,7 @@ export default struct RoomCard {
       .width('100%')
     }
     .width('100%')
-    .padding({top: 10 , left: 10, bottom: 10, right: 10})
+    .padding(10)
     .alignItems(HorizontalAlign.Start)
     .backgroundColor(Color.White)
     .borderRadius({ bottomLeft: 8, bottomRight: 8 })

@@ -1,6 +1,6 @@
 import httpUtil from '../../service/http/HttpUtil'
 import {
-  AddressList,
+  AddressInfo,
   AddressParam,
   AddressType,
   CityItem,
@@ -9,14 +9,8 @@ import {
   DistrictList,
   ProvinceItem,
   ProvinceList
-} from '../../models/recommend/FilterAddressModel'
+} from '../../models/recommend/RecommendAddressModel'
 import Api from '../../service/http/Api'
-
-
-interface ColorData {
-  textColor: ResourceColor
-  bgColor: ResourceColor
-}
 
 
 @Component
@@ -25,13 +19,14 @@ export default struct FilterCriteria {
   @State cityList: CityList = []
   @State districtList: DistrictList = []
 
-  // callBack: (param?: AddressParam) => void = (param?: AddressParam) => { }
-  callBack: () => void = () => {
+  @State pSelIdx: number = 0
+  @State cSelIdx: number = 0
+  @State dSelIdx: number = 0
 
-  }
+  callBack: (param?: AddressParam) => void = (param?: AddressParam) => { }
 
   aboutToAppear(): void {
-    this.requestAddressData()
+    this.requestAddressData(AddressType.province)
   }
 
   build() {
@@ -44,14 +39,14 @@ export default struct FilterCriteria {
       })
 
       //城市
-      this.addressList<ProvinceItem>({
+      this.addressList<CityItem>({
         list: this.cityList,
         type: AddressType.city,
         color: '#EBEBEB'
       })
 
       //县区
-      this.addressList<ProvinceItem>({
+      this.addressList<DistrictItem>({
         list: this.districtList,
         type: AddressType.district,
         color: '#E6E6E6'
@@ -64,25 +59,18 @@ export default struct FilterCriteria {
   }
 
   @Builder
-  addressList<T extends ProvinceItem>($: AddressList<T>) {
+  addressList<T extends ProvinceItem>($: AddressInfo<T>) {
     Column() {
       List() {
         ForEach($.list, (item: T, idx:number) => {
           ListItem() {
             Text(item.name)
               .fontSize(15)
-              .fontColor($r('app.color.primary'))
+              .fontColor(this.handlerTextColor($.type, idx))
               .fontWeight(FontWeight.Medium)
           }
           .padding({ top: 10, bottom: 10 })
-          .onClick(() => {
-            if ($.type == AddressType.province) {
-              this.requestAddressData(item.code, undefined)
-            } else if($.type == AddressType.city) {
-              this.requestAddressData(undefined, item.code)
-            }
-            this.callBack ? this.callBack() : null
-          })
+          .onClick(() => this.handlerDidSelectedAddress($, idx))
         }, (item: T) => item.code)
       }
       .width('100%')
@@ -95,49 +83,52 @@ export default struct FilterCriteria {
     .padding({ top: 10, left: 15, bottom: 10, right: 15 })
   }
 
-
-  @Builder
-  addressPickerBuilder() {
-    Column() {
-      TextPicker() {
-
-      }
+  //处理选中/未选中时的文本颜色
+  handlerTextColor(type:AddressType, idx:number): ResourceColor {
+    if(type == AddressType.province) {
+      return this.pSelIdx == idx ? $r('app.color.primary') : Color.Black
+    } else if(type == AddressType.city) {
+      return this.cSelIdx == idx ? $r('app.color.primary') : Color.Black
+    } else {
+      return this.dSelIdx == idx ? $r('app.color.primary') : Color.Black
     }
-    .height('100%')
-    .layoutWeight(1)
-
-    .padding({ top: 10, left: 15, bottom: 10, right: 15 })
   }
 
-  handlerBgColor<T>(item:AddressList<T>, isProvinceSel:boolean, isCitySel: boolean, isDistrictSel:boolean) {
-    if(item.type == AddressType.province) {
-      return isProvinceSel ? $r('app.color.primary') : Color.Black
-    } else if(item.type == AddressType.city) {
-      return isCitySel ? $r('app.color.primary') : Color.Black
+  //处理选中的地址
+  handlerDidSelectedAddress<T>($: AddressInfo<T>, idx:number) {
+    if ($.type == AddressType.province) {
+      this.pSelIdx = idx
+      this.cSelIdx = 0
+      this.dSelIdx = 0
+      this.requestAddressData($.type)
+    } else if ($.type == AddressType.city) {
+      this.cSelIdx = idx
+      this.dSelIdx = 0
+      this.requestAddressData($.type)
     } else {
-      return isDistrictSel ? $r('app.color.primary') : Color.Black
+      this.dSelIdx = idx
     }
+
+    this.callBack ? this.callBack() : null
   }
 
   //请求筛选位置数据
-  async requestAddressData(provinceCode?: string, cityCode?: string) {
-    let tempProvinceCode = provinceCode ? provinceCode : ''
+  async requestAddressData(type: AddressType) {
+    //获取省份数据
     if (this.provinceList.length == 0) {
-      //获取省份数据
-      const provinceRsp = await httpUtil.get<ProvinceList>(Api.provinceInfo)
-      tempProvinceCode = provinceRsp[0].code ?? ''
-      this.provinceList = provinceRsp
+      this.provinceList = await httpUtil.get<ProvinceList>(Api.provinceInfo)
     }
 
     //获取市数据
-    let cityParam: CityItem = { 'provinceCode': tempProvinceCode }
-    const cityRsp = await httpUtil.get<CityList>(Api.cityInfo, cityParam)
-    const tempCityCode = cityCode ? cityCode : cityRsp[0].code ?? ''
-    this.cityList = cityRsp
+    if(type == AddressType.province) {
+      const provinceCode = this.provinceList[this.pSelIdx].code ?? ''
+      const cityParam: CityItem = { 'provinceCode': provinceCode }
+      this.cityList = await httpUtil.get<CityList>(Api.cityInfo, cityParam)
+    }
 
-    //获取区数据
-    let districtParam: DistrictItem = { 'cityCode': tempCityCode }
-    const districtRsp = await httpUtil.get<DistrictList>(Api.districtInfo, districtParam)
-    this.districtList = districtRsp
+    //获取区域数据
+    const cityCode = this.cityList[this.cSelIdx].code ?? ''
+    const districtParam: DistrictItem = { 'cityCode': cityCode }
+    this.districtList = await httpUtil.get<DistrictList>(Api.districtInfo, districtParam)
   }
 }

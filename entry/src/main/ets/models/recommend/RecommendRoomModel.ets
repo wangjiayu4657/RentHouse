@@ -1,6 +1,7 @@
 import { RoomItem } from '../home/HomeModel'
 
-export interface RecommendModel {
+//推荐房源数据
+export interface RecommendRoomModel {
   records: RecordList //推荐房源的数据源
   total: string //总数据数
 }

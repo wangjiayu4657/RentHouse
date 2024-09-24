@@ -4,7 +4,7 @@ import RoomCard from '../../views/home/RoomCard';
 import NavigationBar from '../../components/NavigationBar';
 import FilterCriteria from '../../views/recommend/FilterCriteria'
 import { RecommendDataSource } from '../../models/recommend/RecommendDataSource';
-import { ActivityItem, RecommendModel, recommendParams, RecordItem } from '../../models/recommend/RecommendModel'
+import { ActivityItem, RecommendRoomModel, recommendParams, RecordItem } from '../../models/recommend/RecommendRoomModel'
 
 @Entry
 @Component
@@ -12,9 +12,13 @@ struct RecommendPage {
   @StorageProp('statusBarHeight') statusBarHeight: number = 0
   @State dataSource: RecommendDataSource = new RecommendDataSource()
   @State zIdx: number = 0
+  @State page: number = 1
+  @State total: number = 0
+  @State isRefreshing: boolean = true
+  @State isShowRefreshIcon: boolean = true
 
   aboutToAppear(): void {
-    this.requestRecommendData()
+    this.requestRecommendData(1)
   }
 
   build() {
@@ -65,7 +69,7 @@ struct RecommendPage {
     }
     .width('100%')
     .height(40)
-    .padding(15)
+    .padding({left: 15, right: 15})
     .justifyContent(FlexAlign.SpaceBetween)
     .backgroundColor(Color.White)
   }
@@ -98,23 +102,47 @@ struct RecommendPage {
 
   @Builder
   recommendRoomBuilder() {
-    WaterFlow() {
-      LazyForEach(this.dataSource, (item: RecordItem) => {
+    WaterFlow({ footer: this.waterFlowFooterBuilder() }) {
+      LazyForEach(this.dataSource, (item: RecordItem, idx:number) => {
         FlowItem() {
           this.flowItemBuilder(item)
         }
         .width('100%')
-        .height(item.activity ? 320 : 210)
+        .padding({top: (idx == 0 || idx == 1) ? 15 : 10})
+        .height(item.activity ? 335 : 220)
       }, (item: RecordItem) => item.id)
     }
     .width('100%')
-    .layoutWeight(1)
+    .height('100%')
     .columnsTemplate('1fr 1fr')
     .columnsGap(8)
-    .rowsGap(8)
-    .padding({ top: 20, left: 15, bottom: 20, right: 15 })
     .backgroundColor('#F7F7F7')
+    .padding({left: 15, right: 15})
     .zIndex(1)
+    .onReachEnd(() => {
+      this.page++
+      this.requestRecommendData(this.page)
+    })
+  }
+
+  @Builder
+  waterFlowFooterBuilder() {
+    if (this.isShowRefreshIcon) {
+     Row({space: 10}){
+       Refresh({ refreshing: true})
+       Text('加载中...').fontColor('#999999').padding({top: 4})
+     }
+     .width('100%')
+     .padding(15)
+     .backgroundColor('#F7F7F7')
+     .justifyContent(FlexAlign.Center)
+    } else {
+      Text('没有更多数据了~')
+        .width('100%')
+        .padding(15)
+        .textAlign(TextAlign.Center)
+        .backgroundColor('#F7F7F7')
+    }
   }
 
   //瀑布流 item
@@ -149,7 +177,12 @@ struct RecommendPage {
         .fontWeight(FontWeight.Bold)
         .borderRadius(4)
         .margin({ top: 4, bottom: 4 })
-        .padding({ top: 4, left: 8, bottom: 4, right: 8 })
+        .padding({
+          top: 4,
+          left: 8,
+          bottom: 4,
+          right: 8
+        })
         .backgroundColor(item.activity.textBackGroundColor)
     }
     .width('100%')
@@ -157,10 +190,21 @@ struct RecommendPage {
   }
 
   //请求房源推荐数据
-  async requestRecommendData() {
-    let params: recommendParams = { 'page': 1, 'limit': 10 }
-    const rsp = await httpUtil.get<RecommendModel>(Api.recommendInfo, params)
-    this.dataSource.setList(rsp.records)
+  async requestRecommendData(page: number) {
+    if(this.dataSource.totalCount() != 0 && this.dataSource.totalCount() >= this.total) {
+      this.isShowRefreshIcon = false
+      return
+    }
+
+    let params: recommendParams = { 'page': page, 'limit': 10 }
+    const rsp = await httpUtil.get<RecommendRoomModel>(Api.recommendInfo, params)
+    if(page == 1) { //刷新
+      this.dataSource.setList(rsp.records)
+    } else {        //翻页
+      this.dataSource.pushList(rsp.records)
+    }
+    this.isRefreshing = false
+    this.total = Number(rsp.total)
   }
 
   //处理数据
