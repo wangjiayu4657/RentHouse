@@ -11,22 +11,22 @@ import {
   ProvinceList
 } from '../../models/recommend/RecommendAddressModel'
 import Api from '../../service/http/Api'
+import { RecommendParams } from '../../models/recommend/RecommendRoomModel'
 
 
 @Component
 export default struct AddressPicker {
-  @State provinceList: ProvinceList = []
-  @State cityList: CityList = []
-  @State districtList: DistrictList = []
-
-  @Prop addressParam:AddressParam
+  @State provinceList: ProvinceList = []   //省份数据源
+  @State cityList: CityList = []           //城市数据源
+  @State districtList: DistrictList = []   //县区数据源
+  @Prop addressParam:RecommendParams       //地址查询条件
 
   //点击空白
   onEmptyClick:VoidCallback = () => {}
   //重置
   onResetClick:VoidCallback = () => {}
   //查看房源
-  onCheckClick:(search:AddressParam) => void = () => {}
+  onCheckClick:(search:RecommendParams) => void = () => {}
 
   aboutToAppear(): void {
     this.requestAddressData(AddressType.province)
@@ -103,7 +103,7 @@ export default struct AddressPicker {
           }
           .width('100%')
           .height(44)
-          .onClick(() => this.handlerDidSelectedAddress($, idx))
+          .onClick(() => this.handlerDidSelectedAddress($, item, idx))
         }, (item: T) => item.code)
       }
       .width('100%')
@@ -128,7 +128,7 @@ export default struct AddressPicker {
   }
 
   //处理选中的地址
-  handlerDidSelectedAddress<T>($: AddressInfo<T>, idx:number) {
+  handlerDidSelectedAddress<T extends ProvinceItem>($: AddressInfo<T>,item: T, idx:number) {
     if ($.type == AddressType.province) {
       this.addressParam.pSelIdx = idx
       this.addressParam.cSelIdx = 0
@@ -140,6 +140,7 @@ export default struct AddressPicker {
       this.requestAddressData($.type)
     } else {
       this.addressParam.dSelIdx = idx
+      this.addressParam.districtName = item.name
     }
   }
 

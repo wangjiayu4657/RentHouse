@@ -4,7 +4,6 @@ import RoomCard from '../../views/home/RoomCard';
 import NavigationBar from '../../components/NavigationBar';
 import AddressPicker from '../../views/recommend/AddressPicker'
 import { RecommendDataSource } from '../../models/recommend/RecommendDataSource';
-import { AddressParam } from '../../models/recommend/RecommendAddressModel';
 import {
   ActivityItem,
   RecommendParams,
@@ -14,11 +13,20 @@ import {
 
 
 
+enum FilterType {
+  address, //地址
+  pay,     //支付方式
+  rent,    //租金
+  sort     //排序
+}
+
+
 @Entry
 @Component
 struct RecommendPage {
   @StorageProp('statusBarHeight') statusBarHeight: number = 0  //状态栏高度
 
+  tabs: string[] = ['位置', '支付方式', '租金', '排序']
   @State page: number = 1       //分页查询页码
   @State total: number = 0      //总数据
   @State dataSource: RecommendDataSource = new RecommendDataSource()  //懒加载数据源
@@ -28,7 +36,7 @@ struct RecommendPage {
 
   @State provinceCode:string = ''             //省份代码
   @State isShowAddressFilter:boolean = false  //是否显示地址筛选条件
-  @State addressParam: AddressParam = { pSelIdx: 0, provinceCode: '11', cSelIdx: 0, cityCode: '', dSelIdx: 0, districtCode: ''}
+  @State addressParam: RecommendParams = { page: 1, limit: 10, pSelIdx: 0, provinceCode: '11', cSelIdx: 0, cityCode: '', dSelIdx: 0, districtCode: '', districtName: ''}
 
   aboutToAppear(): void {
     this.requestRecommendData()
@@ -61,17 +69,17 @@ struct RecommendPage {
   @Builder
   filterItemBuilder() {
     Row() {
-      ForEach(['位置', '支付方式', '租金', '排序'], (item: string) => {
+      ForEach(this.tabs, (_: string, idx:number) => {
         Row({ space: 2 }) {
-          Text(item)
+          Text(this.handlerTabName(idx))
             .fontSize(14)
-            .fontColor('#333')
+            .fontColor(this.handlerTabColor(idx))
             .fontWeight(FontWeight.Medium)
 
           Image($r('app.media.arrow_down'))
             .width(12)
             .aspectRatio(1)
-            .fillColor('#000')
+            .fillColor(this.handlerTabColor(idx))
             .objectFit(ImageFit.Contain)
             .padding({ bottom: 4 })
         }
@@ -116,7 +124,7 @@ struct RecommendPage {
         onResetClick: () => {
          this.resetAddressFilterParam()
         },
-        onCheckClick: (address:AddressParam) => {
+        onCheckClick: (address:RecommendParams) => {
           this.updateAddressFilterParam(address)
         }
       })
@@ -235,6 +243,22 @@ struct RecommendPage {
     .justifyContent(FlexAlign.Center)
   }
 
+  handlerTabName(idx:number) {
+    if(idx == FilterType.address) {
+      let name = this.addressParam.districtName ? this.addressParam.districtName : this.tabs[0]
+      name = name.length > 4 ? (name.substring(0,4) + '...'): name
+      return name
+    }
+    return this.tabs[idx]
+  }
+
+  handlerTabColor(idx:number) {
+    if(idx == FilterType.address) {
+      return this.addressParam.districtName ? '#67C0A8' : '#000000'
+    }
+    return '#000000'
+  }
+
   //请求房源推荐数据
   async requestRecommendData(isReset:boolean = false) {
     this.isShowRefresh = true
@@ -270,25 +294,27 @@ struct RecommendPage {
   }
 
   //更新地址查询条件
-  updateAddressFilterParam(address: AddressParam) {
+  updateAddressFilterParam(address: RecommendParams) {
     this.addressParam = address
-    this.provinceCode = address.provinceCode
+    this.provinceCode = address.provinceCode ?? ''
     this.isShowAddressFilter = false
-
+    console.log('address == ', JSON.stringify(address))
     this.requestRecommendData()
   }
 
   //重置地址查询条件
   resetAddressFilterParam() {
-    this.page = 1
     this.isShowAddressFilter = false
     this.addressParam = {
+      page: 1,
+      limit: 10,
       pSelIdx: 0,
       provinceCode: '11',
       cSelIdx: 0,
       cityCode: '',
       dSelIdx: 0,
-      districtCode: ''
+      districtCode: '',
+      districtName: ''
     }
 
     this.requestRecommendData(true)

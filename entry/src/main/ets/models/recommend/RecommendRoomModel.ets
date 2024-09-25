@@ -35,6 +35,7 @@ export interface RecommendParams {
   provinceCode?: string
   cityCode?: string
   districtCode?: string
+  districtName?: string
   minRent?: string
   maxRent?: string
   paymentTyp?: string
