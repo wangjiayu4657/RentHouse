@@ -29,7 +29,7 @@ export interface ActivityItem {
 }
 
 //推荐数据源请求参数
-export interface recommendParams {
+export interface RecommendParams {
   page: number
   limit: number
   provinceCode?: string
@@ -40,6 +40,9 @@ export interface recommendParams {
   paymentTyp?: string
   orderBy?: string
   orderType?: string
+  pSelIdx?:number
+  cSelIdx?:number
+  dSelIdx?:number
 }
 
 

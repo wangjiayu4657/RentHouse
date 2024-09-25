@@ -14,16 +14,12 @@ import Api from '../../service/http/Api'
 
 
 @Component
-export default struct FilterCriteria {
+export default struct AddressPicker {
   @State provinceList: ProvinceList = []
   @State cityList: CityList = []
   @State districtList: DistrictList = []
 
-  @Prop pSelIdx: number = 0  //选中的省份
-  @Prop cSelIdx: number = 0  //选中的城市
-  @Prop dSelIdx: number = 0  //选中的县区
-
-  addressParam:AddressParam = {provinceCode: '', cityCode: '', districtCode: ''}
+  @Prop addressParam:AddressParam
 
   //点击空白
   onEmptyClick:VoidCallback = () => {}
@@ -40,21 +36,21 @@ export default struct FilterCriteria {
     Column() {
       Row() {
         //省份
-        this.addressPicker<ProvinceItem>({
+        this.addressList<ProvinceItem>({
           list: this.provinceList,
           type: AddressType.province,
           color: '#F7F7F7'
         })
 
         //城市
-        this.addressPicker<CityItem>({
+        this.addressList<CityItem>({
           list: this.cityList,
           type: AddressType.city,
           color: '#EBEBEB'
         })
 
         //县区
-        this.addressPicker<DistrictItem>({
+        this.addressList<DistrictItem>({
           list: this.districtList,
           type: AddressType.district,
           color: '#E6E6E6'
@@ -94,7 +90,7 @@ export default struct FilterCriteria {
   }
 
   @Builder
-  addressPicker<T extends ProvinceItem>($: AddressInfo<T>) {
+  addressList<T extends ProvinceItem>($: AddressInfo<T>) {
     Column() {
       //列表
       List() {
@@ -123,27 +119,27 @@ export default struct FilterCriteria {
   //处理选中/未选中时的文本颜色
   handlerTextColor(type:AddressType, idx:number): ResourceColor {
     if(type == AddressType.province) {
-      return this.pSelIdx == idx ? $r('app.color.primary') : Color.Black
+      return this.addressParam.pSelIdx == idx ? $r('app.color.primary') : Color.Black
     } else if(type == AddressType.city) {
-      return this.cSelIdx == idx ? $r('app.color.primary') : Color.Black
+      return this.addressParam.cSelIdx == idx ? $r('app.color.primary') : Color.Black
     } else {
-      return this.dSelIdx == idx ? $r('app.color.primary') : Color.Black
+      return this.addressParam.dSelIdx == idx ? $r('app.color.primary') : Color.Black
     }
   }
 
   //处理选中的地址
   handlerDidSelectedAddress<T>($: AddressInfo<T>, idx:number) {
     if ($.type == AddressType.province) {
-      this.pSelIdx = idx
-      this.cSelIdx = 0
-      this.dSelIdx = 0
+      this.addressParam.pSelIdx = idx
+      this.addressParam.cSelIdx = 0
+      this.addressParam.dSelIdx = 0
       this.requestAddressData($.type)
     } else if ($.type == AddressType.city) {
-      this.cSelIdx = idx
-      this.dSelIdx = 0
+      this.addressParam.cSelIdx = idx
+      this.addressParam.dSelIdx = 0
       this.requestAddressData($.type)
     } else {
-      this.dSelIdx = idx
+      this.addressParam.dSelIdx = idx
     }
   }
 
@@ -156,25 +152,20 @@ export default struct FilterCriteria {
 
     //获取市数据
     if(type == AddressType.province) {
-      const provinceCode = this.provinceList[this.pSelIdx].code ?? ''
+      const provinceCode = this.provinceList[this.addressParam.pSelIdx ?? 0].code ?? ''
       const cityParam: CityItem = { 'provinceCode': provinceCode }
       this.cityList = await httpUtil.get<CityList>(Api.cityInfo, cityParam)
     }
 
     //获取区域数据
-    const cityCode = this.cityList[this.cSelIdx].code ?? ''
+    const cityCode = this.cityList[this.addressParam.cSelIdx ?? 0].code ?? ''
     const districtParam: DistrictItem = { 'cityCode': cityCode }
     this.districtList = await httpUtil.get<DistrictList>(Api.districtInfo, districtParam)
 
     //获取选中的地址
-    this.addressParam.pSelIdx = this.pSelIdx
-    this.addressParam.provinceCode = this.provinceList[this.pSelIdx].code ?? ''
-
-    this.addressParam.cSelIdx = this.cSelIdx
-    this.addressParam.cityCode = this.cityList[this.cSelIdx].code ?? ''
-
-    this.addressParam.dSelIdx = this.dSelIdx
-    this.addressParam.districtCode = this.districtList[this.dSelIdx].code ?? ''
+    this.addressParam.provinceCode = this.provinceList[this.addressParam.pSelIdx ?? 0].code ?? ''
+    this.addressParam.cityCode = this.cityList[this.addressParam.cSelIdx ?? 0].code ?? ''
+    this.addressParam.districtCode = this.districtList[this.addressParam.dSelIdx ?? 0].code ?? ''
   }
 }
 

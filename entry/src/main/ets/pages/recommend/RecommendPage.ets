@@ -2,31 +2,36 @@ import Api from '../../service/http/Api';
 import httpUtil from '../../service/http/HttpUtil'
 import RoomCard from '../../views/home/RoomCard';
 import NavigationBar from '../../components/NavigationBar';
-import FilterCriteria from '../../views/recommend/FilterCriteria'
+import AddressPicker from '../../views/recommend/AddressPicker'
 import { RecommendDataSource } from '../../models/recommend/RecommendDataSource';
-import { ActivityItem, RecommendRoomModel, recommendParams, RecordItem } from '../../models/recommend/RecommendRoomModel'
 import { AddressParam } from '../../models/recommend/RecommendAddressModel';
+import {
+  ActivityItem,
+  RecommendParams,
+  RecommendRoomModel,
+  RecordItem
+} from '../../models/recommend/RecommendRoomModel'
+
 
 
 @Entry
 @Component
 struct RecommendPage {
   @StorageProp('statusBarHeight') statusBarHeight: number = 0  //状态栏高度
-  @State dataSource: RecommendDataSource = new RecommendDataSource()  //懒加载数据源
+
   @State page: number = 1       //分页查询页码
   @State total: number = 0      //总数据
+  @State dataSource: RecommendDataSource = new RecommendDataSource()  //懒加载数据源
 
   @State isShowRefresh: boolean = true  //是否显示刷新
   @State isNoData:boolean = false       //是否为空数据
 
+  @State provinceCode:string = ''             //省份代码
   @State isShowAddressFilter:boolean = false  //是否显示地址筛选条件
-  @State pSelIdx:number = 0  //选中的省份
-  @State cSelIdx:number = 0  //选中的城市
-  @State dSelIdx:number = 0  //选中的县区
-
+  @State addressParam: AddressParam = { pSelIdx: 0, provinceCode: '11', cSelIdx: 0, cityCode: '', dSelIdx: 0, districtCode: ''}
 
   aboutToAppear(): void {
-    this.requestRecommendData(this.page)
+    this.requestRecommendData()
   }
 
   build() {
@@ -103,27 +108,16 @@ struct RecommendPage {
   @Builder
   filterOptionBuilder() {
     Column() {
-      FilterCriteria({
-        pSelIdx: this.pSelIdx,
-        cSelIdx: this.cSelIdx,
-        dSelIdx: this.dSelIdx,
+      AddressPicker({
+        addressParam: this.addressParam,
         onEmptyClick: () => {
           this.isShowAddressFilter = false
         },
         onResetClick: () => {
-          this.pSelIdx = 0
-          this.cSelIdx = 0
-          this.dSelIdx = 0
-          this.isShowAddressFilter = false
-          this.requestRecommendData(this.page, undefined)
+         this.resetAddressFilterParam()
         },
         onCheckClick: (address:AddressParam) => {
-          // console.log('address -- ', JSON.stringify(address))
-          this.pSelIdx = address.pSelIdx ?? 0
-          this.cSelIdx = address.cSelIdx ?? 0
-          this.dSelIdx = address.dSelIdx ?? 0
-          this.isShowAddressFilter = false
-          this.requestRecommendData(this.page, address)
+          this.updateAddressFilterParam(address)
         }
       })
         .width('100%')
@@ -157,10 +151,11 @@ struct RecommendPage {
     .padding({left: 15, right: 15})
     .onReachEnd(() => {
       this.page++
-      this.requestRecommendData(this.page)
+      this.requestRecommendData()
     })
   }
 
+  //瀑布流尾部上拉加载组件
   @Builder
   waterFlowFooterBuilder() {
     if(!this.isNoData) {
@@ -241,27 +236,29 @@ struct RecommendPage {
   }
 
   //请求房源推荐数据
-  async requestRecommendData(page: number, address?:AddressParam) {
-    if(this.dataSource.totalCount() != 0 && this.dataSource.totalCount() >= this.total) {
+  async requestRecommendData(isReset:boolean = false) {
+    this.isShowRefresh = true
+    const totalCount = this.dataSource.totalCount()
+    if(totalCount != 0 && totalCount >= this.total && !isReset) {
       this.isShowRefresh = false
       return
     }
 
-    let params: recommendParams = {
-      page: page,
+    let params: RecommendParams = {
+      page: this.page,
       limit: 10,
-      provinceCode: address?.provinceCode,
-      cityCode: address?.cityCode,
-      districtCode: address?.districtCode,
+      provinceCode: this.addressParam?.provinceCode,
+      cityCode: this.addressParam?.cityCode,
+      districtCode: this.addressParam?.districtCode,
     }
 
     const rsp = await httpUtil.get<RecommendRoomModel>(Api.recommendInfo, params)
-    if(page == 1) { //刷新
+    if(this.page == 1) { //刷新
       this.dataSource.setList(rsp.records)
     } else {        //翻页
       this.dataSource.pushList(rsp.records)
     }
-
+    this.isShowRefresh = false
     this.total = Number(rsp.total)
     this.isNoData = rsp.records.length == 0
   }
@@ -270,6 +267,31 @@ struct RecommendPage {
   handlerText(item: ActivityItem): string {
     // Reflect是供了对对象操作的方法：get、set、delete等
     return Reflect.get(item, '#text')
+  }
+
+  //更新地址查询条件
+  updateAddressFilterParam(address: AddressParam) {
+    this.addressParam = address
+    this.provinceCode = address.provinceCode
+    this.isShowAddressFilter = false
+
+    this.requestRecommendData()
+  }
+
+  //重置地址查询条件
+  resetAddressFilterParam() {
+    this.page = 1
+    this.isShowAddressFilter = false
+    this.addressParam = {
+      pSelIdx: 0,
+      provinceCode: '11',
+      cSelIdx: 0,
+      cityCode: '',
+      dSelIdx: 0,
+      districtCode: ''
+    }
+
+    this.requestRecommendData(true)
   }
 }
 
