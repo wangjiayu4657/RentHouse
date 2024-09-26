@@ -7,17 +7,15 @@ export interface RecommendRoomModel {
 }
 
 //推荐房源信息
+export type RecordList = RecordItem[]
 export interface RecordItem extends RoomItem {
   activity: ActivityItem //首条数据信息
 }
 
-export type RecordList = RecordItem[]
-
+export type TagList = TagItem[]
 export interface TagItem {
   name: string
 }
-
-export type TagList = TagItem[]
 
 //推荐房源第一条数据
 export interface ActivityItem {
@@ -29,7 +27,7 @@ export interface ActivityItem {
 }
 
 //推荐数据源请求参数
-export interface RecommendParams {
+export interface IParams {
   page: number
   limit: number
   provinceCode?: string
@@ -41,9 +39,71 @@ export interface RecommendParams {
   paymentTyp?: string
   orderBy?: string
   orderType?: string
-  pSelIdx?:number
-  cSelIdx?:number
-  dSelIdx?:number
+  pSelIdx?: number
+  cSelIdx?: number
+  dSelIdx?: number
+}
+
+export class RecommendParams implements IParams {
+  page: number
+  limit: number
+  provinceCode?: string
+  cityCode?: string
+  districtCode?: string
+  districtName?: string
+  minRent?: string
+  maxRent?: string
+  paymentTyp?: string
+  orderBy?: string
+  orderType?: string
+  pSelIdx: number
+  cSelIdx: number
+  dSelIdx: number
+
+  constructor(param?:IParams) {
+    this.page = param?.page ?? 1
+    this.limit = param?.limit ?? 10
+    this.provinceCode = param?.provinceCode
+    this.cityCode = param?.cityCode
+    this.districtCode = param?.districtCode
+    this.districtName = param?.districtName
+    this.minRent = param?.minRent
+    this.maxRent = param?.maxRent
+    this.paymentTyp = param?.paymentTyp
+    this.orderBy = param?.orderBy
+    this.orderType = param?.orderType
+    this.pSelIdx = param?.pSelIdx ?? 0
+    this.cSelIdx = param?.cSelIdx ?? 0
+    this.dSelIdx = param?.dSelIdx ?? 0
+  }
+
+  //重置地址筛选条件
+  resetAddressParam() {
+    this.provinceCode = '11'
+    this.cityCode = ''
+    this.districtCode = ''
+    this.districtName = ''
+    this.pSelIdx = 0
+    this.cSelIdx = 0
+    this.dSelIdx = 0
+  }
+
+  //重置支付筛选条件
+  resetPayWayParam() {
+    this.paymentTyp = ''
+  }
+
+  //重置租金筛选条件
+  resetRentParam() {
+    this.minRent = ''
+    this.maxRent = ''
+  }
+
+  //重置排序筛选条件
+  resetOrderParam() {
+    this.orderBy = ''
+    this.orderType = ''
+  }
 }
 
 

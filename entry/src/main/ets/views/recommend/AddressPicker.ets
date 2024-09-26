@@ -1,7 +1,10 @@
+import Api from '../../service/http/Api'
 import httpUtil from '../../service/http/HttpUtil'
+import FooterOperation from './FooterOperation'
+import { RecommendParams } from '../../models/recommend/RecommendRoomModel'
+import { emitter } from '@kit.BasicServicesKit'
 import {
   AddressInfo,
-  AddressParam,
   AddressType,
   CityItem,
   CityList,
@@ -10,8 +13,6 @@ import {
   ProvinceItem,
   ProvinceList
 } from '../../models/recommend/RecommendAddressModel'
-import Api from '../../service/http/Api'
-import { RecommendParams } from '../../models/recommend/RecommendRoomModel'
 
 
 @Component
@@ -19,17 +20,28 @@ export default struct AddressPicker {
   @State provinceList: ProvinceList = []   //省份数据源
   @State cityList: CityList = []           //城市数据源
   @State districtList: DistrictList = []   //县区数据源
-  @Prop addressParam:RecommendParams       //地址查询条件
+  @Link addressParam:RecommendParams       //地址查询条件
 
-  //点击空白
-  onEmptyClick:VoidCallback = () => {}
-  //重置
-  onResetClick:VoidCallback = () => {}
-  //查看房源
-  onCheckClick:(search:RecommendParams) => void = () => {}
+  districtName?:string
 
   aboutToAppear(): void {
     this.requestAddressData(AddressType.province)
+
+    //重置条件
+    emitter.on('resetFilterCriteria',() => {
+      emitter.emit('resetFilter')
+    })
+
+    //查看房源
+    emitter.on('searchRecommendRoom', () => {
+      this.addressParam.districtName = this.districtName ?? this.districtList[this.addressParam.dSelIdx ?? 0].name ?? ''
+      emitter.emit<string>('searchFilter')
+    })
+  }
+
+  aboutToDisappear(): void {
+    emitter.off('resetFilterCriteria')
+    emitter.off('searchRecommendRoom')
   }
 
   build() {
@@ -62,31 +74,15 @@ export default struct AddressPicker {
       .justifyContent(FlexAlign.SpaceEvenly)
 
       //操作按钮
-      Row({space: 20}) {
-        Button('重置')
-          .btnStyle('#666', '#F0F0F0')
-          .layoutWeight(1)
-          .onClick(() => {
-            this.onResetClick()
-          })
-
-        Button('查看房源')
-          .btnStyle('#fff', '#67C0A8')
-          .layoutWeight(2)
-          .onClick(() => {
-            this.onCheckClick(this.addressParam)
-          })
-      }
+      FooterOperation()
       .width('100%')
       .padding(15)
       .backgroundColor('#F7F7F7')
-      .justifyContent(FlexAlign.SpaceBetween)
     }
     .width('100%')
     .height('100%')
-    .onClick(() => {
-      this.onEmptyClick()
-    })
+    .backgroundColor('#b3000000')
+    .onClick(() => emitter.emit('emptyClick'))
   }
 
   @Builder
@@ -140,7 +136,7 @@ export default struct AddressPicker {
       this.requestAddressData($.type)
     } else {
       this.addressParam.dSelIdx = idx
-      this.addressParam.districtName = item.name
+      this.districtName = item.name
     }
   }
 
@@ -168,13 +164,4 @@ export default struct AddressPicker {
     this.addressParam.cityCode = this.cityList[this.addressParam.cSelIdx ?? 0].code ?? ''
     this.addressParam.districtCode = this.districtList[this.addressParam.dSelIdx ?? 0].code ?? ''
   }
-}
-
-@Extend(Button) function btnStyle(fontColor:ResourceColor, bgColor:ResourceColor) {
-  .type(ButtonType.Normal)
-  .fontSize(14)
-  .fontColor(fontColor)
-  .fontWeight(FontWeight.Medium)
-  .borderRadius(4)
-  .backgroundColor(bgColor)
 }
