@@ -20,7 +20,7 @@ export default struct FooterOperation {
         })
     }
     .width('100%')
-    .height(32)
+    .height(36)
     .backgroundColor('#F7F7F7')
     .justifyContent(FlexAlign.SpaceBetween)
   }

@@ -6,17 +6,20 @@ import AddressPicker from '../../views/recommend/AddressPicker'
 import FilterPayment from '../../views/recommend/FilterPayment';
 import { emitter } from '@kit.BasicServicesKit';
 import { RecommendDataSource } from '../../models/recommend/RecommendDataSource';
+
 import {
   ActivityItem,
+  AddressEcho,
   RecommendParams,
   RecommendRoomModel,
   RecordItem
 } from '../../models/recommend/RecommendRoomModel'
-import { JSON } from '@kit.ArkTS';
+import FilterRent from '../../views/recommend/FilterRent';
+import FilterSort from '../../views/recommend/FilterSort';
 
 
-//筛选类型
-enum FilterType {
+//条件类型类型
+export enum ConditionType {
   address, //地址
   pay,     //支付方式
   rent,    //租金
@@ -27,16 +30,20 @@ enum FilterType {
 @Entry
 @Component
 struct RecommendPage {
-  type:FilterType = FilterType.address
+  total: number = 0 //总数据
+  type:ConditionType = ConditionType.address
   tabs: string[] = ['位置', '支付方式', '租金', '排序'] //筛选条件类型
   @StorageProp('statusBarHeight') statusBarHeight: number = 0 //状态栏高度
-  @State total: number = 0 //总数据
   @State dataSource: RecommendDataSource = new RecommendDataSource() //懒加载数据源
   @State isShowRefresh: boolean = true //是否显示刷新
   @State isNoData: boolean = false //是否为空数据
   @State isShowAddressPicker: boolean = false //是否显示地址筛选条件
   @State isShowFilterPayment: boolean = false //是否显示支付方式筛选条件
+  @State isShowFilterRent: boolean = false    //是否显示租金筛选条件
+  @State isShowFilterSort: boolean = false    //是否显示排序筛选条件
   @State params: RecommendParams = new RecommendParams() //请求参数
+  @State addressEcho:AddressEcho = new AddressEcho(0,0,0,'') //条件筛选条件
+
 
   aboutToAppear(): void {
     this.requestRecommendData()
@@ -53,9 +60,13 @@ struct RecommendPage {
     })
 
     //更新条件查询数据
-    emitter.on<RecommendParams>('searchFilter', () => {
+    emitter.on('searchFilter', (arg) => {
+      if(this.type == ConditionType.address) {
+        this.addressEcho = arg.data as AddressEcho
+      }
       this.hiddenFilterView()
       this.requestRecommendData()
+      console.log('arg ==', JSON.stringify(arg))
     })
   }
 
@@ -124,16 +135,30 @@ struct RecommendPage {
         this.recommendRoomBuilder()
       }
 
-      //地址筛选条件
+      //地址筛选条件组件
       if(this.isShowAddressPicker) {
-        AddressPicker({addressParam: this.params})
+        AddressPicker({addressParam: this.params, addressEcho: this.addressEcho})
           .width('100%')
           .height('100%')
       }
 
-      //支付方式筛选条件
+      //支付方式筛选条件组件
       if(this.isShowFilterPayment) {
-        FilterPayment({param : this.params})
+        FilterPayment({param: this.params})
+          .width('100%')
+          .height('100%')
+      }
+
+      //租金筛选条件组件
+      if(this.isShowFilterRent) {
+        FilterRent({param: this.params})
+          .width('100%')
+          .height('100%')
+      }
+
+      //排序筛选条件组件
+      if(this.isShowFilterSort) {
+        FilterSort({param: this.params})
           .width('100%')
           .height('100%')
       }
@@ -251,39 +276,55 @@ struct RecommendPage {
     .justifyContent(FlexAlign.Center)
   }
 
-  onFilterTabClick(type: FilterType) {
-    if (type == FilterType.address) { //位置
-      this.isShowFilterPayment = false
+  onFilterTabClick(type: ConditionType) {
+    if (type == ConditionType.address) { //位置
       this.isShowAddressPicker = true
-    } else if (type == FilterType.pay) { //支付方式
+      this.isShowFilterPayment = false
+      this.isShowFilterRent = false
+      this.isShowFilterSort = false
+    } else if (type == ConditionType.pay) { //支付方式
       this.isShowAddressPicker = false
       this.isShowFilterPayment = true
-    } else if (type == FilterType.rent) { //租金
-
+      this.isShowFilterRent = false
+      this.isShowFilterSort = false
+    } else if (type == ConditionType.rent) { //租金
+      this.isShowAddressPicker = false
+      this.isShowFilterPayment = false
+      this.isShowFilterRent = true
+      this.isShowFilterSort = false
     } else { //排序
-
+      this.isShowAddressPicker = false
+      this.isShowFilterPayment = false
+      this.isShowFilterRent = false
+      this.isShowFilterSort = true
     }
   }
 
   //处理条件类型回显数据
   handlerTabName(idx: number) {
-    if (idx == FilterType.address) {
-      let name = this.params.districtName ? this.params.districtName : this.tabs[0]
+    if (idx == ConditionType.address) {
+      let name = this.addressEcho.districtName ?  this.addressEcho.districtName : this.tabs[0]
       name = name.length > 4 ? (name.substring(0, 4) + '...') : name
       return name
-    } else if(idx == FilterType.pay) {
+    } else if(idx == ConditionType.pay) {
       let name = this.params.paymentTyp ? this.params.paymentTyp : this.tabs[1]
       return name
+    } else if(idx == ConditionType.rent) {
+      let name = this.params.paymentTyp ? this.params.paymentTyp : this.tabs[2]
+      return name
+    } else {
+      return this.tabs[idx]
     }
-    return this.tabs[idx]
   }
 
   //处理条件类型回显高亮显示
   handlerTabColor(idx: number) {
-    if (idx == FilterType.address) {
-      return this.params.districtName ? '#67C0A8' : '#000000'
-    } else if( idx == FilterType.pay) {
+    if (idx == ConditionType.address) {
+      return this.addressEcho.districtName ? '#67C0A8' : '#000000'
+    } else if( idx == ConditionType.pay) {
       return this.params.paymentTyp ? '#67C0A8' : '#000000'
+    } else if( idx == ConditionType.rent) {
+      return this.params.minRent ? '#67C0A8' : '#000000'
     }
     return '#000000'
   }
@@ -300,7 +341,7 @@ struct RecommendPage {
       this.resetParam()
     }
 
-    // console.log('param -- ', JSON.stringify(this.params))
+    console.log('param -- ', JSON.stringify(this.params))
     const rsp = await httpUtil.get<RecommendRoomModel>(Api.recommendInfo, this.params)
     if (this.params.page == 1) { //刷新
       this.dataSource.setList(rsp.records)
@@ -315,11 +356,12 @@ struct RecommendPage {
 
   //重置筛选条件
   resetParam() {
-    if(this.type == FilterType.address) {
+    if(this.type == ConditionType.address) {
       this.params.resetAddressParam()
-    } else if(this.type == FilterType.pay) {
+      this.addressEcho = new AddressEcho()
+    } else if(this.type == ConditionType.pay) {
       this.params.resetPayWayParam()
-    } else if(this.type == FilterType.rent) {
+    } else if(this.type == ConditionType.rent) {
       this.params.resetRentParam()
     } else {
       this.params.resetOrderParam()
@@ -336,6 +378,8 @@ struct RecommendPage {
   hiddenFilterView() {
     this.isShowAddressPicker = false
     this.isShowFilterPayment = false
+    this.isShowFilterRent = false
+    this.isShowFilterSort = false
   }
 }
 

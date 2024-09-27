@@ -26,6 +26,22 @@ export interface ActivityItem {
   icon: string                    //图标
 }
 
+//筛选地址回显数据
+export class AddressEcho {
+  pSelIdx: number
+  cSelIdx: number
+  dSelIdx: number
+  districtName: string
+
+  constructor(pSelIdx:number = 0, cSelIdx:number = 0, dSelIdx:number = 0, districtName:string = '')  {
+    this.pSelIdx = pSelIdx
+    this.cSelIdx = cSelIdx
+    this.dSelIdx = dSelIdx
+    this.districtName = districtName
+  }
+}
+
+
 //推荐数据源请求参数
 export interface IParams {
   page: number
@@ -33,32 +49,25 @@ export interface IParams {
   provinceCode?: string
   cityCode?: string
   districtCode?: string
-  districtName?: string
   minRent?: string
   maxRent?: string
   paymentTyp?: string
   orderBy?: string
   orderType?: string
-  pSelIdx?: number
-  cSelIdx?: number
-  dSelIdx?: number
 }
 
+//推荐房源接口请求参数
 export class RecommendParams implements IParams {
   page: number
   limit: number
   provinceCode?: string
   cityCode?: string
   districtCode?: string
-  districtName?: string
   minRent?: string
   maxRent?: string
   paymentTyp?: string
   orderBy?: string
   orderType?: string
-  pSelIdx: number
-  cSelIdx: number
-  dSelIdx: number
 
   constructor(param?:IParams) {
     this.page = param?.page ?? 1
@@ -66,15 +75,11 @@ export class RecommendParams implements IParams {
     this.provinceCode = param?.provinceCode
     this.cityCode = param?.cityCode
     this.districtCode = param?.districtCode
-    this.districtName = param?.districtName
     this.minRent = param?.minRent
     this.maxRent = param?.maxRent
     this.paymentTyp = param?.paymentTyp
     this.orderBy = param?.orderBy
     this.orderType = param?.orderType
-    this.pSelIdx = param?.pSelIdx ?? 0
-    this.cSelIdx = param?.cSelIdx ?? 0
-    this.dSelIdx = param?.dSelIdx ?? 0
   }
 
   //重置地址筛选条件
@@ -82,10 +87,6 @@ export class RecommendParams implements IParams {
     this.provinceCode = '11'
     this.cityCode = ''
     this.districtCode = ''
-    this.districtName = ''
-    this.pSelIdx = 0
-    this.cSelIdx = 0
-    this.dSelIdx = 0
   }
 
   //重置支付筛选条件

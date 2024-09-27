@@ -10,10 +10,6 @@ export interface RecommendAddressModel {
 export interface ProvinceItem {
   code?: string  //省代码
   name?: string  //省/市/区名称
-
-  //一下两个是额外添加的属性
-  norColor?: ResourceColor   //默认文本颜色
-  selColor?: ResourceColor   //选中文本颜色
 }
 export type ProvinceList = ProvinceItem[]
 
