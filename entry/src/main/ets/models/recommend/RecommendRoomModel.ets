@@ -51,7 +51,7 @@ export interface IParams {
   districtCode?: string
   minRent?: string
   maxRent?: string
-  paymentTyp?: string
+  paymentType?: string
   orderBy?: string
   orderType?: string
 }
@@ -65,7 +65,7 @@ export class RecommendParams implements IParams {
   districtCode?: string
   minRent?: string
   maxRent?: string
-  paymentTyp?: string
+  paymentType?: string
   orderBy?: string
   orderType?: string
 
@@ -77,7 +77,7 @@ export class RecommendParams implements IParams {
     this.districtCode = param?.districtCode
     this.minRent = param?.minRent
     this.maxRent = param?.maxRent
-    this.paymentTyp = param?.paymentTyp
+    this.paymentType = param?.paymentType
     this.orderBy = param?.orderBy
     this.orderType = param?.orderType
   }
@@ -91,13 +91,13 @@ export class RecommendParams implements IParams {
 
   //重置支付筛选条件
   resetPayWayParam() {
-    this.paymentTyp = ''
+    this.paymentType = ''
   }
 
   //重置租金筛选条件
   resetRentParam() {
-    this.minRent = ''
-    this.maxRent = ''
+    this.minRent = undefined
+    this.maxRent = undefined
   }
 
   //重置排序筛选条件

@@ -43,7 +43,8 @@ struct RecommendPage {
   @State isShowFilterSort: boolean = false    //是否显示排序筛选条件
   @State params: RecommendParams = new RecommendParams() //请求参数
   @State addressEcho:AddressEcho = new AddressEcho(0,0,0,'') //条件筛选条件
-
+  @State rentText: string = ''  //租金回显
+  @State sortDesc: string = ''  //排序回显条件
 
   aboutToAppear(): void {
     this.requestRecommendData()
@@ -55,6 +56,7 @@ struct RecommendPage {
 
     //重置条件
     emitter.on('resetFilter', () => {
+      this.rentText = ''
       this.hiddenFilterView()
       this.requestRecommendData(true)
     })
@@ -63,6 +65,10 @@ struct RecommendPage {
     emitter.on('searchFilter', (arg) => {
       if(this.type == ConditionType.address) {
         this.addressEcho = arg.data as AddressEcho
+      } else if(this.type == ConditionType.rent) {
+        this.rentText = arg.data?.toString() ?? ''
+      } else if(this.type == ConditionType.sort) {
+        this.sortDesc = arg.data?.toString() ?? ''
       }
       this.hiddenFilterView()
       this.requestRecommendData()
@@ -307,13 +313,12 @@ struct RecommendPage {
       name = name.length > 4 ? (name.substring(0, 4) + '...') : name
       return name
     } else if(idx == ConditionType.pay) {
-      let name = this.params.paymentTyp ? this.params.paymentTyp : this.tabs[1]
+      let name = this.params.paymentType ? this.params.paymentType : this.tabs[1]
       return name
     } else if(idx == ConditionType.rent) {
-      let name = this.params.paymentTyp ? this.params.paymentTyp : this.tabs[2]
-      return name
+      return this.rentText.length == 0 ? '租金' : this.rentText
     } else {
-      return this.tabs[idx]
+      return this.sortDesc.length == 0 ? '排序' : this.sortDesc
     }
   }
 
@@ -322,11 +327,11 @@ struct RecommendPage {
     if (idx == ConditionType.address) {
       return this.addressEcho.districtName ? '#67C0A8' : '#000000'
     } else if( idx == ConditionType.pay) {
-      return this.params.paymentTyp ? '#67C0A8' : '#000000'
+      return this.params.paymentType ? '#67C0A8' : '#000000'
     } else if( idx == ConditionType.rent) {
-      return this.params.minRent ? '#67C0A8' : '#000000'
+      return this.rentText ? '#67C0A8' : '#000000'
     }
-    return '#000000'
+    return this.sortDesc ? '#67C0A8' : '#000000'
   }
 
   //请求房源推荐数据

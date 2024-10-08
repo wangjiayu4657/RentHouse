@@ -12,16 +12,18 @@ export default struct FilterPayment {
   payWays: string[] = ['月付', '季付', '半年付', '年付']
 
   aboutToAppear(): void {
-    this.payWay = this.param.paymentTyp ?? ''
+    this.payWay = this.param.paymentType ?? ''
 
     //重置条件
     emitter.on('resetFilterCriteria',() => {
+      this.payWay = ''
+      console.log('resetFilterCriteria')
       emitter.emit('resetFilter')
     })
 
     //查看房源
     emitter.on('searchRecommendRoom', () => {
-      this.param.paymentTyp = this.payWay
+      this.param.paymentType = this.payWay
       emitter.emit('searchFilter')
     })
   }
