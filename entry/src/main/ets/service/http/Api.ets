@@ -18,4 +18,7 @@ export default class Api {
   static readonly cityInfo:string = '/city'
   //推荐房源区位置信息接口
   static readonly districtInfo:string = '/area'
+
+  //推荐房源详情信息接口
+  static readonly recommendDetail:string = '/house/detail'
 }

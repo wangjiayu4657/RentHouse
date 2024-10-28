@@ -19,7 +19,6 @@ export default struct NavigationBar {
         .onClick(() => router.back())
 
       Text(this.title)
-        .id('RecommendPageHelloWorld')
         .fontSize(16)
         .fontColor('#000')
         .fontWeight(FontWeight.Medium)

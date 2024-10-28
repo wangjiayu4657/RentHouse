@@ -16,6 +16,7 @@ import {
 } from '../../models/recommend/RecommendRoomModel'
 import FilterRent from '../../views/recommend/FilterRent';
 import FilterSort from '../../views/recommend/FilterSort';
+import { router } from '@kit.ArkUI';
 
 
 //条件类型类型
@@ -24,6 +25,10 @@ export enum ConditionType {
   pay,     //支付方式
   rent,    //租金
   sort     //排序
+}
+
+export interface RouterParam {
+  id: string
 }
 
 
@@ -183,6 +188,7 @@ struct RecommendPage {
         .width('100%')
         .padding({ top: (idx == 0 || idx == 1) ? 15 : 10 })
         .height(item.activity ? 335 : 220)
+        .onClick(() => this.jumpToTargetPage(item.id))
       }, (item: RecordItem) => item.id)
     }
     .width('100%')
@@ -385,6 +391,14 @@ struct RecommendPage {
     this.isShowFilterPayment = false
     this.isShowFilterRent = false
     this.isShowFilterSort = false
+  }
+
+  jumpToTargetPage(id: string) {
+    let param:RouterParam = { id: id}
+    router.pushUrl({
+      url: 'pages/recommend/RecommendDetailPage',
+      params: param
+    })
   }
 }
 

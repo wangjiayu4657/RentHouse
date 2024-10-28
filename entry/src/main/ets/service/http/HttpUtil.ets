@@ -4,7 +4,8 @@ import { JSON } from '@kit.ArkTS'
 
 const request = axios.create({
   baseURL: 'http://172.30.89.196:6060',
-  // baseURL: 'http://192.168.2.106:6060',
+  // baseURL: 'http://192.168.2.105:6060',
+
   timeout: 20000
 })
 

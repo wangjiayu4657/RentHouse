@@ -27,6 +27,12 @@ export default class EntryAbility extends UIAbility {
     const mainWindow = await windowStage.getMainWindow()
     mainWindow.setWindowLayoutFullScreen(true)
 
+    //获取 window 的宽度
+    const properties = mainWindow.getWindowProperties()
+    const screenWidth = properties.windowRect.width
+    // console.log('area === ', JSON.stringify(properties.windowRect))
+    AppStorage.setOrCreate('screenWidth', px2vp(screenWidth))
+
     //获取有效区域
     let avoidArea = mainWindow.getWindowAvoidArea(window.AvoidAreaType.TYPE_SYSTEM)
     //获取状态栏的高度
@@ -42,9 +48,9 @@ export default class EntryAbility extends UIAbility {
     const safeAreaBottomHeight = avoidArea.bottomRect.height
     AppStorage.setOrCreate('safeAreaBottomHeight', px2vp(safeAreaBottomHeight))
 
-    console.log('area === ', JSON.stringify(avoidArea))
-    const area1 = mainWindow.getWindowAvoidArea(window.AvoidAreaType.TYPE_SYSTEM)
-    console.log('area1 === ', JSON.stringify(area1))
+    // console.log('area === ', JSON.stringify(avoidArea))
+    // const area1 = mainWindow.getWindowAvoidArea(window.AvoidAreaType.TYPE_SYSTEM)
+    // console.log('area1 === ', JSON.stringify(area1))
 
     mainWindow.setWindowSystemBarProperties({
       statusBarContentColor: '#ffffff'
